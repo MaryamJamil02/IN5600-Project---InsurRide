@@ -1,4 +1,4 @@
-package com.example.in5600_project.ui.theme
+package com.example.in5600_project.presentation.ui.theme
 
 import android.app.Activity
 import android.os.Build

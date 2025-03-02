@@ -1,4 +1,4 @@
-package com.example.in5600_project.ui.theme
+package com.example.in5600_project.presentation.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
