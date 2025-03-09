@@ -51,6 +51,8 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()
 
             Text(email)
             Text(password)
+
+
         }
     }
 }
