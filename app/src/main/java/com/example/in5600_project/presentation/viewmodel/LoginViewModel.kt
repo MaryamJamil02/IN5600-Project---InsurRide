@@ -20,8 +20,4 @@ class LoginViewModel : ViewModel() {
     fun onPasswordChanged(newPassword: String) {
         _password.value = newPassword
     }
-
-    fun login() {
-        // Perform login logic (e.g., call repository to validate user)
-    }
 }
