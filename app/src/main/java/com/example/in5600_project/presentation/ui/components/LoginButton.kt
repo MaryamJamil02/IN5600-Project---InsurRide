@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
+import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 @Composable
 fun LoginButton(modifier: Modifier, email: String, password: String, navController: NavController) {
@@ -20,6 +21,7 @@ fun LoginButton(modifier: Modifier, email: String, password: String, navControll
     val userManager = UserManager(context)
     val coroutineScope = rememberCoroutineScope()
     var successfullyLoggedIn = false
+    val myProfileViewModel = MyProfileViewModel()
 
     Button(
         onClick = {
@@ -60,6 +62,9 @@ fun LoginButton(modifier: Modifier, email: String, password: String, navControll
                 if (successfullyLoggedIn) {
                     // Navigate to the next screen or perform other actions
                     navController.navigate("claimsHomeScreen")
+
+                    // Set the current user's email for logout
+                    myProfileViewModel.onEmailChanged(email)
                 }
             }
         }

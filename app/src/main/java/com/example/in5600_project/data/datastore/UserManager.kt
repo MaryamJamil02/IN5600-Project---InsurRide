@@ -53,6 +53,13 @@ class UserManager(private val context: Context) {
             }
         }
     }
+
+    // Logout a specific user
+    suspend fun logoutUser(email: String) {
+        context.dataStore.edit { preferences ->
+            preferences[isLoggedInKey(email)] = false
+        }
+    }
 }
 
 // Clear current data store

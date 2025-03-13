@@ -78,7 +78,7 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()
             }
 
 
-            /* Clear datastore - only use if needed
+            // Clear datastore - only use if needed
             Button(
                 onClick = {
                     coroutineScope.launch {
@@ -89,7 +89,7 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()
 
                 modifier = modifier,
             ) { Text("Clear DataStore") }
-            */
+
 
             Text(email)
             Text(password)
