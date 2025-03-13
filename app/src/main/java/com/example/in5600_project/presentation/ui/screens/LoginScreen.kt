@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.clearDataStore
 import com.example.in5600_project.presentation.ui.components.ChangePasswordDialog
 import com.example.in5600_project.presentation.ui.components.LoginButton
@@ -20,7 +21,7 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()) {
+fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel(), navController: NavController) {
 
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -56,7 +57,7 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()
             )
 
             //Login Button
-            LoginButton(modifier, email, password)
+            LoginButton(modifier, email, password, navController)
 
             Button(
                 onClick = { showDialog = true },

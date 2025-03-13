@@ -64,6 +64,7 @@ dependencies {
     // Coroutine Lifecycle Scopes
     implementation (libs.androidx.lifecycle.viewmodel.ktx)
     implementation (libs.androidx.lifecycle.runtime.ktx.v220)
+    implementation(libs.androidx.navigation.compose)
 
     //------------
 

@@ -12,18 +12,21 @@ import com.example.in5600_project.utils.hashPassword
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.NavController
 
 @Composable
-fun LoginButton(modifier: Modifier, email: String, password: String) {
+fun LoginButton(modifier: Modifier, email: String, password: String, navController: NavController) {
     val context = LocalContext.current
     val userManager = UserManager(context)
     val coroutineScope = rememberCoroutineScope()
+    var successfullyLoggedIn = false
 
     Button(
         onClick = {
 
             // Hash the password before sending it to the server
             val hashedPassword: String = hashPassword(password)
+
             println("Hashed Password: $hashedPassword")
 
             // Use a coroutine to call the server-side and local login method
@@ -33,7 +36,8 @@ fun LoginButton(modifier: Modifier, email: String, password: String) {
                 val users = userManager.getUserPreferences().first()
 
                 // Check if a user with the provided email is already logged in
-                if (users.any { it.email == email && it.isLoggedIn }) {
+                if (users.any { it.email == email }) {
+                    successfullyLoggedIn = true
                     Toast.makeText(context, "Already logged in", Toast.LENGTH_SHORT).show()
                 }
 
@@ -44,12 +48,18 @@ fun LoginButton(modifier: Modifier, email: String, password: String) {
                     if (response == "OK") {
                         // Save the user's data in DataStore
                         userManager.saveUserPreferences(email, hashedPassword, true)
+                        successfullyLoggedIn = true
                         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
                     }
 
                     else {
                         Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
                     }
+                }
+
+                if (successfullyLoggedIn) {
+                    // Navigate to the next screen or perform other actions
+                    navController.navigate("claimsHomeScreen")
                 }
             }
         }
