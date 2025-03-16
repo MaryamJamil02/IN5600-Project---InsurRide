@@ -1,5 +1,6 @@
 package com.example.in5600_project.navigation
 
+import MyProfileScreen
 import android.content.pm.PackageManager
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -9,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.in5600_project.presentation.ui.screens.ClaimsHomeScreen
 import com.example.in5600_project.presentation.ui.screens.LoginScreen
-import com.example.in5600_project.presentation.ui.screens.MyProfileScreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.NavigationBar

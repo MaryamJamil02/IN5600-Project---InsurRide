@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 // Create Preferences DataStore
@@ -19,6 +20,18 @@ class UserManager(private val context: Context) {
     private fun emailKey(email: String) = stringPreferencesKey("user_${email}_name")
     private fun passwordKey(email: String) = stringPreferencesKey("user_${email}_password")
     private fun isLoggedInKey(email: String) = booleanPreferencesKey("user_${email}_is_logged_in")
+
+    // Get the current logged-in user email
+    suspend fun getLoggedInUserEmail(): String? {
+        val preferences = context.dataStore.data.first()
+        val users = preferences[USERS] ?: emptySet()
+        users.forEach { user ->
+            if (preferences[isLoggedInKey(user)] == true) {
+                return user // Return the email of the currently logged-in user
+            }
+        }
+        return null // No user is logged in
+    }
 
     // Save user data in DataStore
     suspend fun saveUserPreferences(email: String, password: String, isLoggedIn: Boolean) {
@@ -53,6 +66,12 @@ class UserManager(private val context: Context) {
             }
         }
     }
+
+    suspend fun logoutUser(email: String) {
+        context.dataStore.edit { preferences ->
+            preferences[isLoggedInKey(email)] = false
+        }
+    }
 }
 
 // Clear current data store
@@ -61,6 +80,7 @@ suspend fun clearDataStore(context: Context) {
         preferences.clear()
     }
 }
+
 
 // Data class to store user information
 data class UserInformation(
