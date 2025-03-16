@@ -6,7 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.in5600_project.navigation.MultipleScreenNavigator
+import com.example.in5600_project.navigation.*
 import com.example.in5600_project.presentation.ui.theme.IN5600ProjectTheme
 
 class MainActivity : ComponentActivity() {

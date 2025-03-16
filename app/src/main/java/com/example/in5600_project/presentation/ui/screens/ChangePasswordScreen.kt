@@ -1,0 +1,54 @@
+package com.example.in5600_project.presentation.ui.screens
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.navigation.NavController
+import com.example.in5600_project.presentation.ui.components.ChangePasswordButton
+import com.example.in5600_project.presentation.viewmodel.ChangePasswordScreenViewModel
+import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
+import androidx.lifecycle.viewmodel.compose.*
+
+
+@Composable
+fun ChangePasswordScreen(
+    modifier: Modifier,
+    viewModel: MyProfileViewModel,
+    navController: NavController
+) {
+
+    val changePasswordScreenViewModel: ChangePasswordScreenViewModel = viewModel()
+    val mail by viewModel.currentemail.collectAsState()
+    val newPassword by changePasswordScreenViewModel.newPassword.collectAsState()
+
+    Column(
+        modifier = modifier
+            .background(Color.LightGray)
+            .fillMaxSize()
+    )
+    {
+        Text("Welcome to Change Password")
+
+        // Create new password
+        OutlinedTextField(
+            value = newPassword,
+            onValueChange = { changePasswordScreenViewModel.onNewPasswordChanged(it) },
+            label = { Text("Password") },
+            visualTransformation = PasswordVisualTransformation()
+        )
+
+        Text(newPassword)
+
+        ChangePasswordButton(mail, newPassword)
+    }
+
+
+}

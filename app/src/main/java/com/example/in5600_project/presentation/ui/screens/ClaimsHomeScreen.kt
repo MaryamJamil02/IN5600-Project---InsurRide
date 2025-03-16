@@ -8,14 +8,14 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
-import com.example.in5600_project.navigation.BottomBar
+import com.example.in5600_project.navigation.*
 import androidx.compose.foundation.pager.*
 import androidx.compose.foundation.layout.fillMaxSize
 
 @Composable
 fun ClaimsHomeScreen(modifier: Modifier = Modifier, navController: NavController) {
     Scaffold(
-        bottomBar = { BottomBar(navController) }
+        bottomBar = { AppBottomBar(navController) }
     ) { innerPadding ->
         // Home screen content goes here
         Box(modifier = modifier.padding(innerPadding)) {

@@ -60,6 +60,13 @@ class UserManager(private val context: Context) {
             preferences[isLoggedInKey(email)] = false
         }
     }
+
+    // Change user password
+    suspend fun changeUserPassword(email: String, newHashedPassword: String) {
+        context.dataStore.edit { preferences ->
+            preferences[passwordKey(email)] = newHashedPassword
+        }
+    }
 }
 
 // Clear current data store

@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.in5600_project.presentation.ui.screens.ClaimsHomeScreen
 import com.example.in5600_project.presentation.ui.screens.LoginScreen
 import com.example.in5600_project.presentation.ui.screens.MyProfileScreen
+import com.example.in5600_project.presentation.ui.screens.ChangePasswordScreen
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.NavigationBar
@@ -29,8 +30,8 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
     // Create one instance of the ViewModel at this higher level
     val myProfileViewModel: MyProfileViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = "login") {
-        composable("login") {
+    NavHost(navController = navController, startDestination = "loginScreen") {
+        composable("loginScreen") {
             LoginScreen(
                 modifier = modifier,
                 navController = navController,
@@ -45,8 +46,16 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
                 //myProfileViewModel = myProfileViewModel
             )
         }
-        composable("myProfile") {
+        composable("myProfileScreen") {
             MyProfileScreen(
+                modifier = modifier,
+                navController = navController,
+                viewModel = myProfileViewModel
+            )
+        }
+
+        composable("changePasswordScreen"){
+            ChangePasswordScreen(
                 modifier = modifier,
                 navController = navController,
                 viewModel = myProfileViewModel
@@ -55,10 +64,8 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
     }
 }
 
-
-
 @Composable
-fun BottomBar(navController: NavController) {
+fun AppBottomBar(navController: NavController) {
     NavigationBar {
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
@@ -70,7 +77,7 @@ fun BottomBar(navController: NavController) {
             icon = { Icon(Icons.Default.Person, contentDescription = "My Profile") },
             label = { Text("My Profile") },
             selected = false,
-            onClick = { navController.navigate("myProfile") }
+            onClick = { navController.navigate("myProfileScreen") }
         )
     }
 }
