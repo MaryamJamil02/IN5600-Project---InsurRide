@@ -16,12 +16,11 @@ import androidx.navigation.NavController
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 @Composable
-fun LoginButton(modifier: Modifier, email: String, password: String, navController: NavController) {
+fun LoginButton(modifier: Modifier, email: String, password: String, myProfileViewModel: MyProfileViewModel, navController: NavController) {
     val context = LocalContext.current
     val userManager = UserManager(context)
     val coroutineScope = rememberCoroutineScope()
     var successfullyLoggedIn = false
-    val myProfileViewModel = MyProfileViewModel()
 
     Button(
         onClick = {
@@ -38,9 +37,9 @@ fun LoginButton(modifier: Modifier, email: String, password: String, navControll
                 val users = userManager.getUserPreferences().first()
 
                 // Check if a user with the provided email is already logged in
-                if (users.any { it.email == email }) {
+                if (users.any { it.email == email && it.password == hashedPassword}) {
                     successfullyLoggedIn = true
-                    Toast.makeText(context, "Already logged in", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "Local login successful", Toast.LENGTH_SHORT).show()
                 }
 
                 else {
@@ -60,11 +59,11 @@ fun LoginButton(modifier: Modifier, email: String, password: String, navControll
                 }
 
                 if (successfullyLoggedIn) {
-                    // Navigate to the next screen or perform other actions
-                    navController.navigate("claimsHomeScreen")
-
                     // Set the current user's email for logout
                     myProfileViewModel.onEmailChanged(email)
+
+                    // Navigate to the next screen or perform other actions
+                    navController.navigate("claimsHomeScreen")
                 }
             }
         }

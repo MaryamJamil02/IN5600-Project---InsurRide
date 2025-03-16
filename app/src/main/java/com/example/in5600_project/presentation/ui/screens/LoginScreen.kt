@@ -17,11 +17,12 @@ import com.example.in5600_project.data.datastore.clearDataStore
 import com.example.in5600_project.presentation.ui.components.ChangePasswordDialog
 import com.example.in5600_project.presentation.ui.components.LoginButton
 import com.example.in5600_project.presentation.viewmodel.LoginViewModel
+import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel(), navController: NavController) {
+fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel(), myProfileViewModel: MyProfileViewModel, navController: NavController) {
 
     val email by viewModel.email.collectAsState()
     val password by viewModel.password.collectAsState()
@@ -57,7 +58,7 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()
             )
 
             //Login Button
-            LoginButton(modifier, email, password, navController)
+            LoginButton(modifier, email, password, myProfileViewModel, navController)
 
             Button(
                 onClick = { showDialog = true },

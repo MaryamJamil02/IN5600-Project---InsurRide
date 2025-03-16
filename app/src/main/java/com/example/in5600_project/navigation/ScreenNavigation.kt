@@ -17,19 +17,44 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.lifecycle.*
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 
-// Controls the navigation and communication of the different screens
 @Composable
 fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) {
     val navController = rememberNavController()
 
+    // Create one instance of the ViewModel at this higher level
+    val myProfileViewModel: MyProfileViewModel = viewModel()
+
     NavHost(navController = navController, startDestination = "login") {
-        composable("login") { LoginScreen(modifier = modifier, navController =navController) }
-        composable("claimsHomeScreen") { ClaimsHomeScreen(modifier, navController) }
-        composable("myProfile") { MyProfileScreen(modifier, navController) }
+        composable("login") {
+            LoginScreen(
+                modifier = modifier,
+                navController = navController,
+                myProfileViewModel = myProfileViewModel
+            )
+        }
+        composable("claimsHomeScreen") {
+            ClaimsHomeScreen(
+                modifier = modifier,
+                navController = navController,
+                // pass it if needed
+                //myProfileViewModel = myProfileViewModel
+            )
+        }
+        composable("myProfile") {
+            MyProfileScreen(
+                modifier = modifier,
+                navController = navController,
+                viewModel = myProfileViewModel
+            )
+        }
     }
 }
+
 
 
 @Composable

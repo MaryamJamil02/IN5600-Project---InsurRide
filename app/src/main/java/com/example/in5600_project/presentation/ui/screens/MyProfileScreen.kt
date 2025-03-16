@@ -7,6 +7,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
@@ -21,11 +23,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: MyProfileViewModel = MyProfileViewModel()) {
+fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: MyProfileViewModel) {
 
     val context = LocalContext.current
     val userManager = UserManager(context)
-    val mail : String = viewModel.currentemail.toString()
+    // Collect the email from the StateFlow
+    val mail by viewModel.currentemail.collectAsState()
 
     Scaffold(
         bottomBar = { BottomBar(navController) }
