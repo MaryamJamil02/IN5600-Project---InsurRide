@@ -32,9 +32,6 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
     // Collect the email from the StateFlow
     val mail by viewModel.currentemail.collectAsState()
 
-    var showDialog by remember { mutableStateOf(false) }
-
-
     Scaffold(
         bottomBar = { AppBottomBar(navController) }
     ) { innerPadding ->
@@ -65,7 +62,7 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
 
                         // Navigate to the login screen after the check
                         withContext(Dispatchers.Main) {
-                            navController.navigate("login")
+                            navController.navigate("loginScreen")
                         }
                     }
                 }

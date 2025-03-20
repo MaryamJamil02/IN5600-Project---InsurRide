@@ -7,13 +7,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.in5600_project.data.datastore.UserManager
-import com.example.in5600_project.data.network.methodPostRemoteLogin
 import com.example.in5600_project.utils.hashPassword
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
+import methodPostRemoteLogin
 
 @Composable
 fun LoginButton(modifier: Modifier, email: String, password: String, myProfileViewModel: MyProfileViewModel, navController: NavController) {
@@ -46,9 +46,9 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                     // Continue with the network login call
                     val response = methodPostRemoteLogin(context, email, hashedPassword)
 
-                    if (response == "OK") {
+                    if (response != null) {
                         // Save the user's data in DataStore
-                        userManager.saveUserPreferences(email, hashedPassword, true)
+                        userManager.saveUserPreferences(response.id,response.email, hashedPassword, true)
                         successfullyLoggedIn = true
                         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
                     }
