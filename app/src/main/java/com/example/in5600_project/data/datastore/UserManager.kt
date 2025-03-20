@@ -16,12 +16,13 @@ class UserManager(private val context: Context) {
     private val USERS = stringSetPreferencesKey("users")
 
     // Functions to create keys for each user based on their email
+    private fun userIdKey(email: String) = stringPreferencesKey("user_${email}_id")
     private fun emailKey(email: String) = stringPreferencesKey("user_${email}_name")
     private fun passwordKey(email: String) = stringPreferencesKey("user_${email}_password")
     private fun isLoggedInKey(email: String) = booleanPreferencesKey("user_${email}_is_logged_in")
 
     // Save user data in DataStore
-    suspend fun saveUserPreferences(email: String, password: String, isLoggedIn: Boolean) {
+    suspend fun saveUserPreferences(id: String,email: String, password: String, isLoggedIn: Boolean) {
 
         context.dataStore.edit { preferences ->
 
@@ -34,6 +35,7 @@ class UserManager(private val context: Context) {
             preferences[USERS] = updatedUsers
 
             // Save the user data with keys specific to that user
+            preferences[userIdKey(email)] = id
             preferences[emailKey(email)] = email
             preferences[passwordKey(email)] = password
             preferences[isLoggedInKey(email)] = isLoggedIn
@@ -46,6 +48,7 @@ class UserManager(private val context: Context) {
             val users = preferences[USERS] ?: emptySet()
             users.map { user ->
                 UserInformation(
+                    id = preferences[userIdKey(user)] ?: "",
                     email = preferences[emailKey(user)] ?: "",
                     password = preferences[passwordKey(user)] ?: "",
                     isLoggedIn = preferences[isLoggedInKey(user)] ?: false
@@ -78,6 +81,7 @@ suspend fun clearDataStore(context: Context) {
 
 // Data class to store user information
 data class UserInformation(
+    val id: String,
     val email: String,
     val password: String,
     val isLoggedIn: Boolean
