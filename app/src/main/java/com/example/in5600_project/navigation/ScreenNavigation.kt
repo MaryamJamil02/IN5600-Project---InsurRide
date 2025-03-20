@@ -42,8 +42,7 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
             ClaimsHomeScreen(
                 modifier = modifier,
                 navController = navController,
-                // pass it if needed
-                //myProfileViewModel = myProfileViewModel
+                myProfileViewModel = myProfileViewModel
             )
         }
         composable("myProfileScreen") {

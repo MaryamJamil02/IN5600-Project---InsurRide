@@ -1,19 +1,26 @@
 package com.example.in5600_project.presentation.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import com.example.in5600_project.data.datastore.ClaimsManager
+import com.example.in5600_project.presentation.ui.components.ClaimsListScreen
 
 
+// Main screen composable that uses ClaimsManager to get claim info.
 @Composable
-fun ClaimCardScreen(modifier: Modifier) {
+fun ClaimCardScreen(modifier: Modifier = Modifier, userId: String) {
 
-    Box(modifier = modifier.background(Color.Red).fillMaxSize()) {
-        Text("Welcome to Cards")
-    }
+    val context = LocalContext.current
+    val claimsManager = remember { ClaimsManager(context) }
+    val claims by claimsManager.getUserClaims(userId).collectAsState(initial = emptyList())
 
+    // Display the list of claim cards.
+    ClaimsListScreen(
+        claims = claims,
+        onPhotoClick = { claim ->
+
+        }
+    )
 }

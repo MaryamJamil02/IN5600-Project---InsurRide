@@ -10,18 +10,18 @@ import org.json.JSONArray
 import org.json.JSONException
 import kotlin.coroutines.resume
 
-suspend fun getMyClaimsDesc(context: Context, id: String): Array<String>? =
+suspend fun getMethodMyClaimsLocation(context: Context, id: String): Array<String>? =
     suspendCancellableCoroutine { cont ->
         val queue = Volley.newRequestQueue(context)
-        val url = "http://10.0.2.2:8080/getMethodMyClaimsDesc?id=$id"
+        val url = "http://10.0.2.2:8080/getMethodMyClaimsLocation?id=$id"
         val jsonArrayRequest = object : JsonArrayRequest(
             Request.Method.GET,
             url,
             null,
             Response.Listener<JSONArray> { response ->
                 try {
-                    val descArray = Array(response.length()) { i -> response.getString(i) }
-                    cont.resume(descArray)
+                    val locationArray = Array(response.length()) { i -> response.getString(i) }
+                    cont.resume(locationArray)
                 } catch (e: JSONException) {
                     e.printStackTrace()
                     cont.resume(null)

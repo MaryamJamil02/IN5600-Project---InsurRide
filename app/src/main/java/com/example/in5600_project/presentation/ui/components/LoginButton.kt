@@ -13,8 +13,11 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
-import com.example.in5600_project.data.network.getMyClaimsDesc
-import com.example.in5600_project.data.network.getMyClaimsNumber
+import com.example.in5600_project.data.network.getMethodMyClaimsDesc
+import com.example.in5600_project.data.network.getMethodMyClaimsLocation
+import com.example.in5600_project.data.network.getMethodMyClaimsNumber
+import com.example.in5600_project.data.network.getMethodMyClaimsPhoto
+import com.example.in5600_project.data.network.getMethodMyClaimsStatus
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 import methodPostRemoteLogin
 
@@ -66,12 +69,16 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                 }
 
                 if (successfullyLoggedIn) {
-                    val claimsList = getMyClaimsDesc(context,currentUserId)
-                    val claimsNumber = getMyClaimsNumber(context,currentUserId)
+                    val claimsList = getMethodMyClaimsDesc(context,currentUserId)
+                    val claimsNumber = getMethodMyClaimsNumber(context,currentUserId)
+                    val claimsPhoto = getMethodMyClaimsPhoto(context,currentUserId)
+                    val claimsLocation = getMethodMyClaimsLocation(context,currentUserId)
+                    val claimsStatus = getMethodMyClaimsStatus(context,currentUserId)
 
                     // Store the fetched claims in DataStore for offline use.
-                    if (claimsNumber != null && claimsList != null) {
-                        claimsManager.saveUserClaims(currentUserId, claimsNumber,claimsList)
+                    if (claimsNumber != null && claimsList != null && claimsPhoto != null && claimsLocation != null && claimsStatus != null)
+                    {
+                        claimsManager.saveUserClaims(currentUserId, claimsNumber,claimsList, claimsPhoto, claimsLocation, claimsStatus)
                     }
                     // Set the current user's email for logout
                     myProfileViewModel.onUserIdChanged(currentUserId)

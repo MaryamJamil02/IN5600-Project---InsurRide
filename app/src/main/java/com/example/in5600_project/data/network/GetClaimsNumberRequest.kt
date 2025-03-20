@@ -9,7 +9,7 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
 
-suspend fun getMyClaimsNumber(context: Context, id: String): String? =
+suspend fun getMethodMyClaimsNumber(context: Context, id: String): String? =
     suspendCancellableCoroutine { cont ->
         val queue = Volley.newRequestQueue(context)
         val url = "http://10.0.2.2:8080/getMethodMyClaimsNumber?id=$id"

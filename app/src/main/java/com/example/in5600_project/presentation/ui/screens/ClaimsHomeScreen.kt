@@ -11,23 +11,27 @@ import androidx.navigation.NavController
 import com.example.in5600_project.navigation.*
 import androidx.compose.foundation.pager.*
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 @Composable
-fun ClaimsHomeScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun ClaimsHomeScreen(modifier: Modifier = Modifier, navController: NavController, myProfileViewModel: MyProfileViewModel) {
     Scaffold(
         bottomBar = { AppBottomBar(navController) }
     ) { innerPadding ->
-        // Home screen content goes here
         Box(modifier = modifier.padding(innerPadding)) {
             Text("Welcome to Home")
         }
-        SwipeScreens(modifier, innerPadding)
+        SwipeScreens(modifier, innerPadding, myProfileViewModel)
     }
 }
 
 @Composable
-fun SwipeScreens(modifier: Modifier, padding: PaddingValues) {
+fun SwipeScreens(modifier: Modifier, padding: PaddingValues, myProfileViewModel: MyProfileViewModel) {
     val pagerState = rememberPagerState(pageCount = { 2 })
+    val userId by myProfileViewModel.currentUserId.collectAsState()
+
 
     HorizontalPager(
         state = pagerState,
@@ -35,12 +39,12 @@ fun SwipeScreens(modifier: Modifier, padding: PaddingValues) {
     ) { page ->
         when (page) {
             0 -> {
-                // Compose your Map screen here.
+                // Map screen
                 MapScreen(modifier = modifier)
             }
             1 -> {
-                // Compose your Cards screen here.
-                ClaimCardScreen(modifier = modifier)
+                // Cards screen
+                ClaimCardScreen(modifier = modifier, userId = userId)
             }
         }
     }
