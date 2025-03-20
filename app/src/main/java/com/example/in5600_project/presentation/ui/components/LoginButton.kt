@@ -12,6 +12,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
+import com.example.in5600_project.data.datastore.ClaimsManager
+import com.example.in5600_project.data.network.getMyClaimsDesc
+import com.example.in5600_project.data.network.getMyClaimsNumber
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 import methodPostRemoteLogin
 
@@ -19,6 +22,7 @@ import methodPostRemoteLogin
 fun LoginButton(modifier: Modifier, email: String, password: String, myProfileViewModel: MyProfileViewModel, navController: NavController) {
     val context = LocalContext.current
     val userManager = UserManager(context)
+    val claimsManager = ClaimsManager(context)
     val coroutineScope = rememberCoroutineScope()
     var successfullyLoggedIn = false
     var currentUserId = ""
@@ -62,6 +66,10 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                 }
 
                 if (successfullyLoggedIn) {
+                    val claimsList = getMyClaimsDesc(context,currentUserId) // or response.id if available
+
+                    // Store the fetched claims in DataStore for offline use.
+                    claimsManager.saveUserClaims(currentUserId, claimsList)
                     // Set the current user's email for logout
                     myProfileViewModel.onUserIdChanged(currentUserId)
 
