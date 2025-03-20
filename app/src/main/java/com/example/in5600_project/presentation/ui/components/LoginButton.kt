@@ -50,12 +50,12 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
 
                 else {
                     // Continue with the network login call
-                    val response = methodPostRemoteLogin(context, email, hashedPassword)
+                    val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
 
-                    if (response != null) {
+                    if (responseLogin != null) {
                         // Save the user's data in DataStore
-                        userManager.saveUserPreferences(response.id,response.email, hashedPassword, true)
-                        currentUserId = response.id
+                        userManager.saveUserPreferences(responseLogin.id,responseLogin.email, hashedPassword, true)
+                        currentUserId = responseLogin.id
                         successfullyLoggedIn = true
                         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
                     }
@@ -66,10 +66,13 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                 }
 
                 if (successfullyLoggedIn) {
-                    val claimsList = getMyClaimsDesc(context,currentUserId) // or response.id if available
+                    val claimsList = getMyClaimsDesc(context,currentUserId)
+                    val claimsNumber = getMyClaimsNumber(context,currentUserId)
 
                     // Store the fetched claims in DataStore for offline use.
-                    claimsManager.saveUserClaims(currentUserId, claimsList)
+                    if (claimsNumber != null && claimsList != null) {
+                        claimsManager.saveUserClaims(currentUserId, claimsNumber,claimsList)
+                    }
                     // Set the current user's email for logout
                     myProfileViewModel.onUserIdChanged(currentUserId)
 

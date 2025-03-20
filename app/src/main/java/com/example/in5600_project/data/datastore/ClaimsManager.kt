@@ -17,15 +17,17 @@ data class ClaimInformation(
 )
 
 // Define a key to store the claims for a specific user (using the user's id).
+private fun numberOfClaimsKey(id: String) = stringPreferencesKey("user_${id}_nr_of_claims")
 private fun claimsKey(id: String) = stringPreferencesKey("user_${id}_claims")
 
 class ClaimsManager(private val context: Context) {
     private val gson = Gson()
 
     // Save claims for a user by serializing the list into a JSON string.
-    suspend fun saveUserClaims(id: String, claims: Array<String>?) {
+    suspend fun saveUserClaims(id: String, numberOfClaims: String, claims: Array<String>?) {
         val claimsJson = gson.toJson(claims)
         context.dataStore.edit { preferences ->
+            preferences[numberOfClaimsKey(id)] = numberOfClaims
             preferences[claimsKey(id)] = claimsJson
         }
     }
