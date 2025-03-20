@@ -31,7 +31,7 @@ fun ChangePasswordScreen(
 ) {
 
     val changePasswordScreenViewModel: ChangePasswordScreenViewModel = viewModel()
-    val mail by viewModel.currentemail.collectAsState()
+    val userId by viewModel.currentUserId.collectAsState()
     val newPassword by changePasswordScreenViewModel.newPassword.collectAsState()
 
     Column(
@@ -54,7 +54,7 @@ fun ChangePasswordScreen(
 
         Text(newPassword)
 
-        ChangePasswordButton(mail, newPassword)
+        ChangePasswordButton(userId, newPassword)
     }
 
 

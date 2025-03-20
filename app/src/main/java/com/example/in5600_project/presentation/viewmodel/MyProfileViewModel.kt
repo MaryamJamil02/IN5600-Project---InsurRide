@@ -6,11 +6,11 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class MyProfileViewModel : ViewModel() {
 
-    private val _currentemail = MutableStateFlow("")
-    val currentemail = _currentemail.asStateFlow()
+    private val _currentUserId = MutableStateFlow("")
+    val currentUserId = _currentUserId.asStateFlow()
 
-    fun onEmailChanged(newEmail: String) {
-        _currentemail.value = newEmail
+    fun onUserIdChanged(newUserId: String) {
+        _currentUserId.value = newUserId
     }
 
 }

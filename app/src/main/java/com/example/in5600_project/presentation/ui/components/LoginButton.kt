@@ -21,6 +21,7 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
     val userManager = UserManager(context)
     val coroutineScope = rememberCoroutineScope()
     var successfullyLoggedIn = false
+    var currentUserId = ""
 
     Button(
         onClick = {
@@ -39,6 +40,7 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                 // Check if a user with the provided email is already logged in
                 if (users.any { it.email == email && it.password == hashedPassword}) {
                     successfullyLoggedIn = true
+                    currentUserId = users.first { it.email == email }.id
                     Toast.makeText(context, "Local login successful", Toast.LENGTH_SHORT).show()
                 }
 
@@ -49,6 +51,7 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                     if (response != null) {
                         // Save the user's data in DataStore
                         userManager.saveUserPreferences(response.id,response.email, hashedPassword, true)
+                        currentUserId = response.id
                         successfullyLoggedIn = true
                         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
                     }
@@ -60,7 +63,7 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
 
                 if (successfullyLoggedIn) {
                     // Set the current user's email for logout
-                    myProfileViewModel.onEmailChanged(email)
+                    myProfileViewModel.onUserIdChanged(currentUserId)
 
                     // Navigate to the next screen or perform other actions
                     navController.navigate("claimsHomeScreen")

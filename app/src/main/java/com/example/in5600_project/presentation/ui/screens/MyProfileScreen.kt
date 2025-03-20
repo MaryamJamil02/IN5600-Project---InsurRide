@@ -29,8 +29,8 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
 
     val context = LocalContext.current
     val userManager = UserManager(context)
-    // Collect the email from the StateFlow
-    val mail by viewModel.currentemail.collectAsState()
+    // Collect the user id from the StateFlow
+    val userId by viewModel.currentUserId.collectAsState()
 
     Scaffold(
         bottomBar = { AppBottomBar(navController) }
@@ -42,17 +42,17 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
                         // Logout the user by setting isLoggedIn to false in DataStore
-                        userManager.logoutUser(mail)
+                        userManager.logoutUser(userId)
 
                         // Retrieve the updated user preferences
                         val users = userManager.getUserPreferences().first()
-                        val currentUser = users.find { it.email == mail }
+                        val currentUser = users.find { it.id == userId }
 
                         // Check if the user's isLoggedIn flag is now false
                         if (currentUser == null || !currentUser.isLoggedIn) {
                             // Switch to the Main thread to show the toast
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "Logout successful for $mail", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Logout successful for $userId", Toast.LENGTH_SHORT).show()
                             }
                         } else {
                             withContext(Dispatchers.Main) {

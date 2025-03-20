@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun ChangePasswordButton(email: String, clearPassword: String) {
+fun ChangePasswordButton(userId: String, clearPassword: String) {
 
     val context = LocalContext.current
     val userManager = UserManager(context)
@@ -30,11 +30,11 @@ fun ChangePasswordButton(email: String, clearPassword: String) {
         coroutineScope.launch {
 
             // Send the password change request to the server
-            val response = methodPostChangePasswd(context, email, clearPassword, hashedPassword)
+            val response = methodPostChangePasswd(context, userId, clearPassword, hashedPassword)
 
             if (response == "OK") {
                 // Change the user's password in DataStore
-                userManager.changeUserPassword(email, hashedPassword)
+                userManager.changeUserPassword(userId, hashedPassword)
                 Toast.makeText(context, "Password changed successfully", Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(context, "Password change failed", Toast.LENGTH_SHORT).show()

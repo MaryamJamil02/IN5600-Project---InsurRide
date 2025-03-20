@@ -15,14 +15,14 @@ class UserManager(private val context: Context) {
     // A key to store the set of emails
     private val USERS = stringSetPreferencesKey("users")
 
-    // Functions to create keys for each user based on their email
-    private fun userIdKey(email: String) = stringPreferencesKey("user_${email}_id")
-    private fun emailKey(email: String) = stringPreferencesKey("user_${email}_name")
-    private fun passwordKey(email: String) = stringPreferencesKey("user_${email}_password")
-    private fun isLoggedInKey(email: String) = booleanPreferencesKey("user_${email}_is_logged_in")
+    // Functions to create keys for each user based on their id
+    private fun userIdKey(id: String) = stringPreferencesKey("user_${id}_id")
+    private fun emailKey(id: String) = stringPreferencesKey("user_${id}_mail")
+    private fun passwordKey(id: String) = stringPreferencesKey("user_${id}_password")
+    private fun isLoggedInKey(id: String) = booleanPreferencesKey("user_${id}_is_logged_in")
 
     // Save user data in DataStore
-    suspend fun saveUserPreferences(id: String,email: String, password: String, isLoggedIn: Boolean) {
+    suspend fun saveUserPreferences(id: String, email: String, password: String, isLoggedIn: Boolean) {
 
         context.dataStore.edit { preferences ->
 
@@ -30,15 +30,15 @@ class UserManager(private val context: Context) {
             val currentUsers = preferences[USERS] ?: emptySet()
 
             // Add the current email to the set
-            val updatedUsers = currentUsers + email
+            val updatedUsers = currentUsers + id
 
             preferences[USERS] = updatedUsers
 
             // Save the user data with keys specific to that user
-            preferences[userIdKey(email)] = id
-            preferences[emailKey(email)] = email
-            preferences[passwordKey(email)] = password
-            preferences[isLoggedInKey(email)] = isLoggedIn
+            preferences[userIdKey(id)] = id
+            preferences[emailKey(id)] = email
+            preferences[passwordKey(id)] = password
+            preferences[isLoggedInKey(id)] = isLoggedIn
         }
     }
 
@@ -58,16 +58,16 @@ class UserManager(private val context: Context) {
     }
 
     // Logout a specific user
-    suspend fun logoutUser(email: String) {
+    suspend fun logoutUser( id: String) {
         context.dataStore.edit { preferences ->
-            preferences[isLoggedInKey(email)] = false
+            preferences[isLoggedInKey(id)] = false
         }
     }
 
     // Change user password
-    suspend fun changeUserPassword(email: String, newHashedPassword: String) {
+    suspend fun changeUserPassword(id: String, newHashedPassword: String) {
         context.dataStore.edit { preferences ->
-            preferences[passwordKey(email)] = newHashedPassword
+            preferences[passwordKey(id)] = newHashedPassword
         }
     }
 }
