@@ -14,6 +14,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.network.getMethodMyClaimsDesc
+import com.example.in5600_project.data.network.getMethodMyClaimsIds
 import com.example.in5600_project.data.network.getMethodMyClaimsLocation
 import com.example.in5600_project.data.network.getMethodMyClaimsNumber
 import com.example.in5600_project.data.network.getMethodMyClaimsPhoto
@@ -30,7 +31,7 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
     var successfullyLoggedIn = false
     var currentUserId = ""
 
-    Button(
+    Button( modifier = modifier,
         onClick = {
 
             // Hash the password before sending it to the server
@@ -69,16 +70,17 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                 }
 
                 if (successfullyLoggedIn) {
-                    val claimsList = getMethodMyClaimsDesc(context,currentUserId)
                     val claimsNumber = getMethodMyClaimsNumber(context,currentUserId)
+                    val claimsIds = getMethodMyClaimsIds(context,currentUserId)
+                    val claimsList = getMethodMyClaimsDesc(context,currentUserId)
                     val claimsPhoto = getMethodMyClaimsPhoto(context,currentUserId)
                     val claimsLocation = getMethodMyClaimsLocation(context,currentUserId)
                     val claimsStatus = getMethodMyClaimsStatus(context,currentUserId)
 
                     // Store the fetched claims in DataStore for offline use.
-                    if (claimsNumber != null && claimsList != null && claimsPhoto != null && claimsLocation != null && claimsStatus != null)
+                    if (claimsNumber != null && claimsList != null && claimsPhoto != null && claimsLocation != null && claimsStatus != null && claimsIds != null)
                     {
-                        claimsManager.saveUserClaims(currentUserId, claimsNumber,claimsList, claimsPhoto, claimsLocation, claimsStatus)
+                        claimsManager.saveUserClaims(currentUserId, claimsNumber, claimsIds, claimsList, claimsPhoto, claimsLocation, claimsStatus)
                     }
                     // Set the current user's email for logout
                     myProfileViewModel.onUserIdChanged(currentUserId)

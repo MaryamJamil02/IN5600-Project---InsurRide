@@ -1,14 +1,10 @@
 package com.example.in5600_project.data.datastore
 
 import android.content.Context
-import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-
-// Create Preferences DataStore
-//private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 class UserManager(private val context: Context) {
 
@@ -56,6 +52,19 @@ class UserManager(private val context: Context) {
             }
         }
     }
+
+    suspend fun getUserEmailString(targetUserId: String): String {
+        return context.dataStore.data.map { preferences ->
+            val users = preferences[USERS] ?: emptySet()
+            val matchingUser = users.firstOrNull { user ->
+                preferences[userIdKey(user)] == targetUserId
+            }
+            matchingUser?.let { preferences[emailKey(it)] } ?: ""
+        }.first()
+    }
+
+
+
 
     // Logout a specific user
     suspend fun logoutUser( id: String) {

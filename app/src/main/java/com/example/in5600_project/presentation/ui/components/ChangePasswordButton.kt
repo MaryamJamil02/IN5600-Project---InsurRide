@@ -28,9 +28,11 @@ fun ChangePasswordButton(userId: String, clearPassword: String) {
 
 
         coroutineScope.launch {
+            val email = userManager.getUserEmailString(userId)
+
 
             // Send the password change request to the server
-            val response = methodPostChangePasswd(context, userId, clearPassword, hashedPassword)
+            val response = methodPostChangePasswd(context, email, clearPassword, hashedPassword)
 
             if (response == "OK") {
                 // Change the user's password in DataStore
