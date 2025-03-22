@@ -20,6 +20,8 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.in5600_project.presentation.ui.screens.NewClaimScreen
+import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 
@@ -29,6 +31,7 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
 
     // Create one instance of the ViewModel at this higher level
     val myProfileViewModel: MyProfileViewModel = viewModel()
+    val claimViewModel: ClaimViewModel = viewModel()
 
     NavHost(navController = navController, startDestination = "loginScreen") {
         composable("loginScreen") {
@@ -58,6 +61,14 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
                 modifier = modifier,
                 navController = navController,
                 viewModel = myProfileViewModel
+            )
+        }
+
+        composable("newClaimScreen"){
+            NewClaimScreen(
+                modifier = modifier,
+                navController = navController,
+                claimViewModel = claimViewModel
             )
         }
     }

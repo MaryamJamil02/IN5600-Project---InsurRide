@@ -27,11 +27,13 @@ private fun claimsStatusKey(id: String) = stringPreferencesKey("user_${id}_claim
 class ClaimsManager(private val context: Context) {
     private val gson = Gson()
 
+    // Maximum number of claims allowed per user
+    private val MAXCLAIMS = 5
+
     // Save claims for a user by serializing the list into a JSON string.
     suspend fun saveUserClaims(id: String, numberOfClaims: String, claimsIds: Array<String>?, claimsDesc: Array<String>?, claimsPhoto: Array<String>?, claimsLocation: Array<String>?, claimsStatus: Array<String>) {
 
         val claimsIdsJson = gson.toJson(claimsIds)
-
         val claimsDescJson = gson.toJson(claimsDesc)
         val claimsPhotoJson = gson.toJson(claimsPhoto)
         val claimsLocationJson = gson.toJson(claimsLocation)
@@ -79,5 +81,61 @@ class ClaimsManager(private val context: Context) {
             }
         }
     }
+
+    suspend fun updateOrInsertClaimAtIndex(userId: String, index: Int, newClaim: ClaimInformation, isInsert: Boolean) {
+        context.dataStore.edit { preferences ->
+            // Get the current number of claims
+            val numberOfClaimsStr = preferences[numberOfClaimsKey(userId)] ?: "0"
+            val numberOfClaims = numberOfClaimsStr.toIntOrNull() ?: 0
+
+            // Get each field's JSON array
+            val claimsIdJson = preferences[claimsIdKey(userId)] ?: "[]"
+            val claimsDescJson = preferences[claimsDescKey(userId)] ?: "[]"
+            val claimsPhotoJson = preferences[claimsPhotoKey(userId)] ?: "[]"
+            val claimsLocationJson = preferences[claimsLocationKey(userId)] ?: "[]"
+            val claimsStatusJson = preferences[claimsStatusKey(userId)] ?: "[]"
+
+            // Deserialize the JSON arrays into mutable lists.
+            val claimsIdsList = gson.fromJson(claimsIdJson, Array<String>::class.java).toMutableList()
+            val claimsDescList = gson.fromJson(claimsDescJson, Array<String>::class.java).toMutableList()
+            val claimsPhotoList = gson.fromJson(claimsPhotoJson, Array<String>::class.java).toMutableList()
+            val claimsLocationList = gson.fromJson(claimsLocationJson, Array<String>::class.java).toMutableList()
+            val claimsStatusList = gson.fromJson(claimsStatusJson, Array<String>::class.java).toMutableList()
+
+            // Check that the provided index is within allowed bounds.
+            if (index in 0 until MAXCLAIMS) {
+                if (index < numberOfClaims) {
+                    // If the index is within the current number of claims, replace the claim.
+                    claimsIdsList[index] = newClaim.claimId
+                    claimsDescList[index] = newClaim.claimDes
+                    claimsPhotoList[index] = newClaim.claimPhoto
+                    claimsLocationList[index] = newClaim.claimLocation
+                    claimsStatusList[index] = newClaim.claimStatus
+                } else if (index == numberOfClaims) {
+                    // If the index equals the number of claims, append the new claim (if we haven't reached max).
+                    if (numberOfClaims < MAXCLAIMS) {
+                        claimsIdsList.add(newClaim.claimId)
+                        claimsDescList.add(newClaim.claimDes)
+                        claimsPhotoList.add(newClaim.claimPhoto)
+                        claimsLocationList.add(newClaim.claimLocation)
+                        claimsStatusList.add(newClaim.claimStatus)
+
+                        // Increase the stored number of claims if we're inserting.
+                        if (isInsert){
+                            preferences[numberOfClaimsKey(userId)] = (numberOfClaims + 1).toString()
+                        }
+                    }
+                }
+                // Save the updated arrays back to DataStore.
+                preferences[claimsIdKey(userId)] = gson.toJson(claimsIdsList)
+                preferences[claimsDescKey(userId)] = gson.toJson(claimsDescList)
+                preferences[claimsPhotoKey(userId)] = gson.toJson(claimsPhotoList)
+                preferences[claimsLocationKey(userId)] = gson.toJson(claimsLocationList)
+                preferences[claimsStatusKey(userId)] = gson.toJson(claimsStatusList)
+            }
+        }
+    }
+
+
 
 }

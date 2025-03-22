@@ -23,12 +23,12 @@ fun ClaimsHomeScreen(modifier: Modifier = Modifier, navController: NavController
         Box(modifier = modifier.padding(innerPadding)) {
             Text("Welcome to Home")
         }
-        SwipeScreens(modifier, innerPadding, myProfileViewModel)
+        SwipeScreens(modifier, innerPadding, myProfileViewModel, navController)
     }
 }
 
 @Composable
-fun SwipeScreens(modifier: Modifier, padding: PaddingValues, myProfileViewModel: MyProfileViewModel) {
+fun SwipeScreens(modifier: Modifier, padding: PaddingValues, myProfileViewModel: MyProfileViewModel, navController: NavController) {
     val pagerState = rememberPagerState(pageCount = { 2 })
     val userId by myProfileViewModel.currentUserId.collectAsState()
 
@@ -44,7 +44,7 @@ fun SwipeScreens(modifier: Modifier, padding: PaddingValues, myProfileViewModel:
             }
             1 -> {
                 // Cards screen
-                ClaimCardScreen(modifier = modifier, userId = userId)
+                ClaimCardScreen(modifier = modifier, userId = userId, navController = navController)
             }
         }
     }

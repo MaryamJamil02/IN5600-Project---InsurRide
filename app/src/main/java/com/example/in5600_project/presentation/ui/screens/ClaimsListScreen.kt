@@ -1,4 +1,4 @@
-package com.example.in5600_project.presentation.ui.components
+package com.example.in5600_project.presentation.ui.screens
 
 
 import androidx.compose.foundation.layout.*
@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.in5600_project.data.datastore.ClaimInformation
+import com.example.in5600_project.presentation.ui.components.ClaimCard
 
 // Composable to display a list of claim cards using LazyColumn.
 @Composable
@@ -21,6 +22,7 @@ fun ClaimsListScreen(
             .fillMaxSize()
             .padding(8.dp)
     ) {
+
         items(claims) { claim ->
             ClaimCard(
                 claim = claim,
