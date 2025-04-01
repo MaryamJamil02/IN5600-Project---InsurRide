@@ -1,20 +1,15 @@
 package com.example.in5600_project.presentation.ui.screens
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
-
+import com.example.in5600_project.presentation.ui.screens.ClaimsListScreen
 
 @Composable
 fun ClaimCardScreen(
@@ -42,11 +37,13 @@ fun ClaimCardScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ClaimsListScreen to display the list of claims.
+        // Use the updated ClaimsListScreen with onClaimClick callback.
         ClaimsListScreen(
             claims = claims,
-            onPhotoClick = { claim ->
-                // Handle photo click if needed
+            onClaimClick = { claim ->
+                // Navigate to the claim info screen.
+                // Here we pass the claim id (or you could pass more info if using a Parcelable).
+                navController.navigate("claimInfoScreen/${claim.claimId}")
             }
         )
     }

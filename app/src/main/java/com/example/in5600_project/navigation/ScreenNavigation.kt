@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.in5600_project.presentation.ui.screens.ClaimInfoScreen
 import com.example.in5600_project.presentation.ui.screens.NewClaimScreen
 import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
@@ -70,6 +71,14 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
                 navController = navController,
                 claimViewModel = claimViewModel,
                 myProfileViewModel = myProfileViewModel
+            )
+        }
+
+        composable("claimInfoScreen"){
+            ClaimInfoScreen(
+                claim = it.arguments?.getString("claimId") ?: "",
+                navController = navController
+                //claimViewModel = claimViewModel
             )
         }
     }
