@@ -8,19 +8,19 @@ import com.android.volley.toolbox.Volley
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-suspend fun postInsertNewClaim(
+suspend fun postUpdateClaim(
     context: Context,
     userId: String,
     indexUpdateClaim: String,
-    newClaimDescription: String,
-    newClaimPhoto: String,
-    newClaimLocation: String,
-    newClaimStatus: String
+    updateClaimDescription: String,
+    updateClaimPhoto: String,
+    updateClaimLocation: String,
+    updateClaimStatus: String
 ): String? = suspendCancellableCoroutine { cont ->
 
     val queue = Volley.newRequestQueue(context)
-    val baseUrl = "http://10.0.2.2:8080/postInsertNewClaim"
-    val postUrl = "$baseUrl?userId=$userId&indexUpdateClaim=$indexUpdateClaim&newClaimDes=$newClaimDescription&newClaimPho=$newClaimPhoto&newClaimLoc=$newClaimLocation&newClaimSta=$newClaimStatus"
+    val baseUrl = "http://10.0.2.2:8080/postUpdateClaim"
+    val postUrl = "$baseUrl?userId=$userId&indexUpdateClaim=$indexUpdateClaim&updateClaimDes=$updateClaimDescription&updateClaimPho=$updateClaimPhoto&updateClaimLoc=$updateClaimLocation&updateClaimSta=$updateClaimStatus"
 
     val stringRequest = object : StringRequest(
         Request.Method.POST,

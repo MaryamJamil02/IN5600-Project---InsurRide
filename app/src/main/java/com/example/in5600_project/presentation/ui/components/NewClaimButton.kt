@@ -61,6 +61,8 @@ fun NewClaimButton(
                     // Insert the new claim locally.
                     claimsManager.updateOrInsertClaimAtIndex(userId, numberOfClaims, newClaim, true)
 
+                    // LATERFIX - navigate claiminfoscreen
+
                     Toast.makeText(context, "New claim added successfully", Toast.LENGTH_SHORT)
                         .show()
                 } else {

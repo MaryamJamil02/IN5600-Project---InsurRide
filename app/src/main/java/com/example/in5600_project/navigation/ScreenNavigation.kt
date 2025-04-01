@@ -98,7 +98,9 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
                 modifier = modifier,
                 claim = claim,
                 navController = navController,
-                viewModel = claimInfoViewModel
+                viewModel = claimInfoViewModel,
+                context = context,
+                userId = userId
             )
         }
     }
