@@ -1,5 +1,6 @@
 package com.example.in5600_project.presentation.ui.screens
 
+//LATERFIX - use * instead
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,6 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -29,17 +31,20 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
-import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.presentation.ui.components.NewClaimButton
 import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
+import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 @Composable
 fun NewClaimScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    claimViewModel: ClaimViewModel = viewModel()
+    claimViewModel: ClaimViewModel = viewModel(),
+    myProfileViewModel: MyProfileViewModel,
 ) {
     var expanded by remember { mutableStateOf(false) }
+    val userId by myProfileViewModel.currentUserId.collectAsState()
+
 
     val description = claimViewModel.description.value
     val location = claimViewModel.location.value
@@ -47,12 +52,17 @@ fun NewClaimScreen(
     val statusOptions = claimViewModel.statusOptions
     val imageUri = claimViewModel.imageUri.value
 
-    // Launcher to pick an image from the gallery.
+
+    // Launcher to pick an image from the gallery
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         claimViewModel.onImageUriChanged(uri)
     }
+
+    // Extract the filename from imageUri
+    val imageFileName = imageUri?.lastPathSegment ?: ""
+    println("Selected image filename: $imageFileName")
 
     Column(
         modifier = Modifier
@@ -60,27 +70,30 @@ fun NewClaimScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // OutlinedTextField for Description.
+
+        // Description.
         OutlinedTextField(
             value = description,
             onValueChange = { claimViewModel.onDescriptionChanged(it) },
             label = { Text("Description") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier.fillMaxWidth()
         )
-        // OutlinedTextField for Location.
+
+        // Location
         OutlinedTextField(
             value = location,
             onValueChange = { claimViewModel.onLocationChanged(it) },
             label = { Text("Location") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier.fillMaxWidth()
         )
-        // Dropdown for Status selection.
-        androidx.compose.foundation.layout.Box(modifier = Modifier.fillMaxWidth()) {
+
+        // Dropdown for Status
+        androidx.compose.foundation.layout.Box(modifier = modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = selectedStatus,
                 onValueChange = {},
                 label = { Text("Status") },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = modifier.fillMaxWidth(),
                 readOnly = true,
                 trailingIcon = {
                     IconButton(onClick = { expanded = true }) {
@@ -94,7 +107,7 @@ fun NewClaimScreen(
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth()
             ) {
                 statusOptions.forEach { status ->
                     DropdownMenuItem(
@@ -107,27 +120,33 @@ fun NewClaimScreen(
                 }
             }
         }
-        // Button to select a photo from the gallery.
+
+        // Button to select a photo from the gallery
         Button(
             onClick = { launcher.launch("image/*") },
-            modifier = Modifier.fillMaxWidth()
+            modifier = modifier.fillMaxWidth()
         ) {
             Text("Select Photo")
         }
-        // Display a preview of the selected image, if available.
+
+        // Display a preview of the selected image, if it's available
         imageUri?.let { uri ->
             Image(
                 painter = rememberAsyncImagePainter(model = uri),
                 contentDescription = "Selected Photo",
-                modifier = Modifier
+                modifier = modifier
                     .fillMaxWidth()
                     .height(200.dp)
             )
         }
 
-        //NewClaimButton(userId, claimIndex, description, imageUri, location, selectedStatus)
-
+        // Pass the image filename to the NewClaimButton.
+        NewClaimButton(
+            userId = userId,
+            newClaimDescription = description,
+            newClaimPhoto = imageFileName,
+            newClaimLocation = location,
+            newClaimStatus = selectedStatus
+        )
     }
-
-
 }

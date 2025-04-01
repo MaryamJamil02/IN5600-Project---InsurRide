@@ -68,7 +68,8 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
             NewClaimScreen(
                 modifier = modifier,
                 navController = navController,
-                claimViewModel = claimViewModel
+                claimViewModel = claimViewModel,
+                myProfileViewModel = myProfileViewModel
             )
         }
     }

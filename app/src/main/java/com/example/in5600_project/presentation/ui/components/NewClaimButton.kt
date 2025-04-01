@@ -9,12 +9,12 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.datastore.ClaimInformation
 import kotlinx.coroutines.launch
-import postInsertNewClaim
+import com.example.in5600_project.data.network.postInsertNewClaim
+import kotlinx.coroutines.flow.first
 
 @Composable
 fun NewClaimButton(
     userId: String,
-    claimIndex: String,
     newClaimDescription: String,
     newClaimPhoto: String,
     newClaimLocation: String,
@@ -26,38 +26,49 @@ fun NewClaimButton(
 
     Button(onClick = {
         coroutineScope.launch {
-            // Call the network method to insert a new claim on the server.
-            val responseNewClaim = postInsertNewClaim(
-                context,
-                userId,
-                claimIndex,
-                newClaimDescription,
-                newClaimPhoto,
-                newClaimLocation,
-                newClaimStatus
-            )
+            val numberOfClaims = claimsManager.getNumberOfClaims(userId).first()
 
-            if (responseNewClaim != null) {
-                // Convert claimIndex to an integer for updateClaimAtIndex.
-                val index = claimIndex.toIntOrNull() ?: 0
-                val newClaim = ClaimInformation(
-                    claimId = claimIndex,
-                    claimDes = newClaimDescription,
-                    claimPhoto = newClaimPhoto,
-                    claimLocation = newClaimLocation,
-                    claimStatus = newClaimStatus
+            println("Number of claims: $numberOfClaims")
+
+            // Check if there are available slots for new claims
+            if (numberOfClaims >= 5) {
+                Toast.makeText(context, "No available slot for new claim", Toast.LENGTH_SHORT)
+                    .show()
+                return@launch
+            } else {
+
+                // Call the network method to insert a new claim on the server.
+                val responseNewClaim = postInsertNewClaim(
+                    context,
+                    userId,
+                    numberOfClaims.toString(),
+                    newClaimDescription,
+                    newClaimPhoto,
+                    newClaimLocation,
+                    newClaimStatus
                 )
 
-                // Insert the claim locally.
-                claimsManager.updateOrInsertClaimAtIndex(userId, index, newClaim, true)
+                if (responseNewClaim != null) {
+                    // Create a new ClaimInformation object.
+                    val newClaim = ClaimInformation(
+                        claimId = numberOfClaims.toString(),
+                        claimDes = newClaimDescription,
+                        claimPhoto = newClaimPhoto,
+                        claimLocation = newClaimLocation,
+                        claimStatus = newClaimStatus
+                    )
 
-                Toast.makeText(context, "New claim added successfully", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Failed to add new claim", Toast.LENGTH_SHORT).show()
+                    // Insert the new claim locally.
+                    claimsManager.updateOrInsertClaimAtIndex(userId, numberOfClaims, newClaim, true)
+
+                    Toast.makeText(context, "New claim added successfully", Toast.LENGTH_SHORT)
+                        .show()
+                } else {
+                    Toast.makeText(context, "Failed to add new claim", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }) {
         Text("Add New Claim")
     }
 }
-
