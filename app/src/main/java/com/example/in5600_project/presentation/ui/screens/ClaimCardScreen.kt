@@ -13,20 +13,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.data.datastore.ClaimsManager
 
 
 @Composable
 fun ClaimCardScreen(
     modifier: Modifier = Modifier,
-    userId: String,
-    navController: NavController
+    navController: NavController,
+    claims: List<ClaimInformation>
 ) {
-    val context = LocalContext.current
-    val claimsManager = remember { ClaimsManager(context) }
 
-    // Collect claims state from ClaimsManager using getUserClaims function.
-    val claims by claimsManager.getUserClaims(userId).collectAsState(initial = emptyList())
 
     Column(
         modifier = modifier
@@ -45,9 +42,7 @@ fun ClaimCardScreen(
         // ClaimsListScreen to display the list of claims.
         ClaimsListScreen(
             claims = claims,
-            onPhotoClick = { claim ->
-                // Handle photo click if needed
-            }
+            navController = navController
         )
     }
 }

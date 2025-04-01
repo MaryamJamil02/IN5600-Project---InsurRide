@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.presentation.ui.components.ClaimCard
 
@@ -15,7 +16,7 @@ import com.example.in5600_project.presentation.ui.components.ClaimCard
 fun ClaimsListScreen(
     claims: List<ClaimInformation>,
     onPhotoClick: (ClaimInformation) -> Unit = {},
-    onLocationClick: (ClaimInformation) -> Unit = {}
+    navController: NavController
 ) {
     LazyColumn(
         modifier = Modifier
@@ -27,7 +28,7 @@ fun ClaimsListScreen(
             ClaimCard(
                 claim = claim,
                 onClickPhoto = { onPhotoClick(claim) },
-                onClickLocation = { onLocationClick(claim) }
+                navController = navController
             )
         }
     }

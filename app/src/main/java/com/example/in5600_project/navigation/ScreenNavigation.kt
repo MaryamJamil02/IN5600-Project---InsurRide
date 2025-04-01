@@ -18,9 +18,17 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.in5600_project.data.datastore.ClaimInformation
+import com.example.in5600_project.data.datastore.ClaimsManager
+import com.example.in5600_project.presentation.ui.screens.ClaimInfoScreen
 import com.example.in5600_project.presentation.ui.screens.NewClaimScreen
+import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
@@ -32,6 +40,13 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
     // Create one instance of the ViewModel at this higher level
     val myProfileViewModel: MyProfileViewModel = viewModel()
     val claimViewModel: ClaimViewModel = viewModel()
+    val claimInfoViewModel: ClaimInfoViewModel = viewModel()
+    val context = LocalContext.current
+    val claimsManager = remember { ClaimsManager(context) }
+    val userId by myProfileViewModel.currentUserId.collectAsState()
+
+    // Collect claims state from ClaimsManager using getUserClaims function.
+    val claims by claimsManager.getUserClaims(userId).collectAsState(initial = emptyList())
 
     NavHost(navController = navController, startDestination = "loginScreen") {
         composable("loginScreen") {
@@ -45,7 +60,8 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
             ClaimsHomeScreen(
                 modifier = modifier,
                 navController = navController,
-                myProfileViewModel = myProfileViewModel
+                myProfileViewModel = myProfileViewModel,
+                claims = claims
             )
         }
         composable("myProfileScreen") {
@@ -70,6 +86,19 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
                 navController = navController,
                 claimViewModel = claimViewModel,
                 myProfileViewModel = myProfileViewModel
+            )
+        }
+
+        composable("claimInfoScreen/{claimId}") { backStackEntry ->
+            val claimId = backStackEntry.arguments?.getString("claimId") ?: ""
+            // Find the claim in the list by matching claimId.
+            val claim: ClaimInformation = claims.find { it.claimId == claimId }
+                ?: ClaimInformation("", "", "", "", "")
+            ClaimInfoScreen(
+                modifier = modifier,
+                claim = claim,
+                navController = navController,
+                viewModel = claimInfoViewModel
             )
         }
     }
