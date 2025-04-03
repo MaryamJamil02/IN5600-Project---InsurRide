@@ -169,7 +169,10 @@ class ClaimsManager(private val context: Context) {
                 }
             } else {
                 // Update the claim at the given index.
-                if (index in 0 until maxclaims) {
+                println("Updateeee index $index")
+                println("Updateeee maxclaims $maxclaims")
+                if (index < maxclaims) {
+                    println("Updateeee if")
                     claimsIdsList[index] = newClaim.claimId
                     claimsDescList[index] = newClaim.claimDes
                     claimsPhotoList[index] = newClaim.claimPhoto

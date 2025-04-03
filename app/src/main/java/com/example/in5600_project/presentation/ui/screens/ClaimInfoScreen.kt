@@ -128,7 +128,7 @@ fun ClaimInfoScreen(
                         // Update the claim in your DataStore
                         // Create a new ClaimInformation object.
                         val updatedClaim = ClaimInformation(
-                            claimId = numberOfClaims.toString(),
+                            claimId = claim.claimId,
                             claimDes = viewModel.description.value,
                             claimPhoto = viewModel.photo.value,
                             claimLocation = viewModel.location.value,
@@ -138,15 +138,16 @@ fun ClaimInfoScreen(
                         // Insert the new claim locally.
                         claimsManager.updateOrInsertClaimAtIndex(
                             userId,
-                            numberOfClaims,
+                            claim.claimId.toInt(),
                             updatedClaim,
                             false
                         )
 
                         Toast.makeText(context, "Claim updated successfully", Toast.LENGTH_SHORT)
                             .show()
-                        navController.navigate("claimsHomeScreen")
 
+                        navController.navigate("claimsHomeScreen")
+                        viewModel.exitEditMode()
                     } else {
                         Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT)
                             .show()

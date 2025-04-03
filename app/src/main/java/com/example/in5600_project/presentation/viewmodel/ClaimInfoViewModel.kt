@@ -27,6 +27,10 @@ class ClaimInfoViewModel : ViewModel() {
         isEditMode.value = true
     }
 
+    fun exitEditMode() {
+        isEditMode.value = false
+    }
+
     fun onDescriptionChanged(newDescription: String) {
         description.value = newDescription
     }
