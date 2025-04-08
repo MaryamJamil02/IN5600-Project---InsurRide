@@ -1,16 +1,15 @@
 package com.example.in5600_project.presentation.ui.screens
 
 //LATERFIX - use * instead
+import android.annotation.SuppressLint
+import android.content.Context
 import android.net.Uri
+import android.provider.OpenableColumns
+import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -27,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -34,6 +34,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.in5600_project.presentation.ui.components.NewClaimButton
 import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
+import java.io.InputStream
 
 @Composable
 fun NewClaimScreen(
@@ -44,6 +45,7 @@ fun NewClaimScreen(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val userId by myProfileViewModel.currentUserId.collectAsState()
+    val context = LocalContext.current
 
 
     val description = claimViewModel.description.value
@@ -88,7 +90,7 @@ fun NewClaimScreen(
         )
 
         // Dropdown for Status
-        androidx.compose.foundation.layout.Box(modifier = modifier.fillMaxWidth()) {
+        Box(modifier = modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = selectedStatus,
                 onValueChange = {},
@@ -138,15 +140,43 @@ fun NewClaimScreen(
                     .fillMaxWidth()
                     .height(200.dp)
             )
+
+            Text("Filename$imageFileName")
+
         }
 
+
+
+
         // Pass the image filename to the NewClaimButton.
-        NewClaimButton(
-            userId = userId,
-            newClaimDescription = description,
-            newClaimPhoto = imageFileName,
-            newClaimLocation = location,
-            newClaimStatus = selectedStatus
-        )
+        if (imageUri != null) {
+            NewClaimButton(
+                userId = userId,
+                newClaimDescription = description,
+                newClaimPhoto = getFileName1(context, imageUri)!!,
+                newClaimLocation = location,
+                newClaimStatus = selectedStatus,
+                imageUri = imageUri
+            )
+        }
     }
 }
+
+@SuppressLint("Range")
+fun getFileName1(context: Context, uri: Uri): String? {
+    var fileName: String? = null
+    // Query the content resolver for the display name
+    val cursor = context.contentResolver.query(uri, null, null, null, null)
+    cursor?.use {
+        if (it.moveToFirst()) {
+            fileName = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+        }
+    }
+    // Fallback: extract file name from the URI's path if the content resolver did not return one
+    if (fileName == null) {
+        fileName = uri.path?.substringAfterLast('/')
+    }
+    return fileName
+}
+
+

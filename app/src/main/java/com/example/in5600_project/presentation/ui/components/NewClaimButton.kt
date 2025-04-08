@@ -1,5 +1,8 @@
 package com.example.in5600_project.presentation.ui.components
 
+import android.content.Context
+import android.net.Uri
+import android.util.Base64
 import android.widget.Toast
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -10,7 +13,9 @@ import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.datastore.ClaimInformation
 import kotlinx.coroutines.launch
 import com.example.in5600_project.data.network.postInsertNewClaim
+import com.example.in5600_project.data.network.postMethodUploadPhoto
 import kotlinx.coroutines.flow.first
+import java.io.InputStream
 
 @Composable
 fun NewClaimButton(
@@ -18,7 +23,8 @@ fun NewClaimButton(
     newClaimDescription: String,
     newClaimPhoto: String,
     newClaimLocation: String,
-    newClaimStatus: String
+    newClaimStatus: String,
+    imageUri : Uri
 ) {
     val context = LocalContext.current
     val claimsManager = ClaimsManager(context)
@@ -47,6 +53,15 @@ fun NewClaimButton(
                     newClaimLocation,
                     newClaimStatus
                 )
+                
+                val responseUploadPhoto = postMethodUploadPhoto(
+                    context,
+                    userId,
+                    numberOfClaims.toString(),
+                    newClaimPhoto,
+                    imageUri
+                )
+                    
 
                 if (responseNewClaim != null) {
                     // Create a new ClaimInformation object.
@@ -74,3 +89,5 @@ fun NewClaimButton(
         Text("Add New Claim")
     }
 }
+
+
