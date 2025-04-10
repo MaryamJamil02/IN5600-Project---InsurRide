@@ -2,7 +2,6 @@ package com.example.in5600_project.presentation.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.widget.Toast
@@ -14,13 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -43,7 +36,7 @@ fun ClaimInfoScreen(
     modifier: Modifier,
     claim: ClaimInformation,
     navController: NavController,
-    viewModel: ClaimInfoViewModel,
+    viewModel: ClaimInfoViewModel = viewModel(),
     context: Context,
     userId: String
 ) {
@@ -52,16 +45,15 @@ fun ClaimInfoScreen(
 
     var expanded by remember { mutableStateOf(false) }
 
-    // Launcher to pick an image from the gallery – available in edit mode.
+    // Launcher to pick an image from the gallery (only used in edit mode).
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        // You can update the photo state here if you allow selecting a new image.
+        // Save the full content:// URI into the ViewModel’s state so we can display it.
         uri?.let { viewModel.onPhotoChanged(it.toString()) }
     }
 
-
-    // In view mode, trigger fetching of the photo using its file name.
+    // If not editing, fetch the (existing) photo from server if it’s not empty.
     LaunchedEffect(claim.claimPhoto) {
         if (!viewModel.isEditMode.value && claim.claimPhoto.isNotEmpty()) {
             viewModel.fetchPhoto(context, claim.claimPhoto)
@@ -69,7 +61,9 @@ fun ClaimInfoScreen(
     }
 
     if (!viewModel.isEditMode.value) {
-        // View mode: show claim details and an "Edit Claim" button.
+        // --------------------------
+        // VIEW MODE
+        // --------------------------
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -81,9 +75,7 @@ fun ClaimInfoScreen(
             )
             Spacer(modifier = modifier.height(4.dp))
 
-            /*coroutineScope.launch {
-                generateClaimBitmap(claim.claimPhoto, context)
-            }*/
+            // Show the claim image. Typically you'd fetch from server + decode to show it.
             DisplayClaimImage(claim.claimPhoto, context)
 
             Spacer(modifier = modifier.height(8.dp))
@@ -102,6 +94,7 @@ fun ClaimInfoScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = modifier.height(16.dp))
+
             Button(onClick = {
                 viewModel.enterEditMode(claim)
                 // Also fetch the photo in edit mode if necessary.
@@ -111,20 +104,15 @@ fun ClaimInfoScreen(
             }
         }
     } else {
-        // Edit mode: show editable fields pre-filled with the claim info.
+        // --------------------------
+        // EDIT MODE
+        // --------------------------
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            AsyncImage(
-                model = if (viewModel.photo.value.isNotEmpty()) viewModel.photo.value else null,
-                contentDescription = "Claim Photo",
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-            Spacer(modifier = modifier.height(8.dp))
+
             OutlinedTextField(
                 value = viewModel.description.value,
                 onValueChange = { viewModel.onDescriptionChanged(it) },
@@ -132,6 +120,7 @@ fun ClaimInfoScreen(
                 modifier = modifier.fillMaxWidth()
             )
             Spacer(modifier = modifier.height(8.dp))
+
             OutlinedTextField(
                 value = viewModel.location.value,
                 onValueChange = { viewModel.onLocationChanged(it) },
@@ -139,6 +128,7 @@ fun ClaimInfoScreen(
                 modifier = modifier.fillMaxWidth()
             )
             Spacer(modifier = modifier.height(8.dp))
+
             // Dropdown for Status
             Box(modifier = modifier.fillMaxWidth()) {
                 OutlinedTextField(
@@ -173,14 +163,16 @@ fun ClaimInfoScreen(
                 }
             }
             Spacer(modifier = modifier.height(16.dp))
-            // Button to select a photo from the gallery in edit mode.
+
+            // Button to select a new photo from the gallery
             Button(
                 onClick = { launcher.launch("image/*") },
                 modifier = modifier.fillMaxWidth()
             ) {
                 Text("Select Photo")
             }
-            // Display a preview of the selected image, if available.
+
+            // Preview the newly selected image
             if (viewModel.photo.value.isNotEmpty()) {
                 AsyncImage(
                     model = viewModel.photo.value,
@@ -191,36 +183,47 @@ fun ClaimInfoScreen(
                 )
             }
             Spacer(modifier = modifier.height(16.dp))
+
+            // Button to confirm the update
             Button(onClick = {
-                // Implement update logic (update the claim locally and on the server).
                 coroutineScope.launch {
-                    val numberOfClaims = claimsManager.getNumberOfClaims(userId).first()
+                    // We keep the full content URI in viewModel.photo.
+                    // But for the server, we want to store only the final filename portion:
+                    val fullUri = viewModel.photo.value
+                    // Extract lastPathSegment, minus extension if you prefer:
+                    val cleanedFileName = if (fullUri.isNotEmpty()) {
+                        Uri.parse(fullUri).lastPathSegment ?: ""
+                    } else {
+                        ""
+                    }
 
                     val responseUpdatedClaim = postUpdateClaim(
                         context = context,
                         userId = userId,
                         indexUpdateClaim = claim.claimId,
                         updateClaimDescription = viewModel.description.value,
-                        // This photo now is the URI string obtained from decoding the Base64.
-                        updateClaimPhoto = viewModel.photo.value,
+                        // pass the cleaned filename instead of the entire content://...
+                        updateClaimPhoto = cleanedFileName,
                         updateClaimLocation = viewModel.location.value,
                         updateClaimStatus = viewModel.status.value
                     )
 
+                    // Now upload the actual photo bits to the server, passing the same cleaned name
                     val responseUpdatePhoto = postMethodUploadPhoto(
                         context = context,
                         userId = userId,
                         claimId = claim.claimId,
-                        fileName = viewModel.photo.value,
-                        imageUri = Uri.parse(viewModel.photo.value)
+                        fileName = cleanedFileName,
+                        // BUT use the original full URI to read the actual bytes
+                        imageUri = Uri.parse(fullUri)
                     )
 
-                    if (responseUpdatedClaim != null) {
-                        // Update the claim in your DataStore.
+                    if (responseUpdatedClaim != null && responseUpdatePhoto != null) {
+                        // Update the local DataStore
                         val updatedClaim = ClaimInformation(
                             claimId = claim.claimId,
                             claimDes = viewModel.description.value,
-                            claimPhoto = viewModel.photo.value,
+                            claimPhoto = cleanedFileName, // store only the shortened name
                             claimLocation = viewModel.location.value,
                             claimStatus = viewModel.status.value
                         )
@@ -238,8 +241,7 @@ fun ClaimInfoScreen(
                         navController.navigate("claimsHomeScreen")
                         viewModel.exitEditMode()
                     } else {
-                        Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT).show()
                     }
                 }
             }) {
@@ -249,24 +251,35 @@ fun ClaimInfoScreen(
     }
 }
 
+/**
+ * Helper function to download a base64 image from server, decode it, and return an ImageBitmap.
+ */
 suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap? {
-    // Assume getMethodDownloadPhoto(context, fileName) is defined elsewhere
     val base64String = getMethodDownloadPhoto(context, fileName)
     if (base64String != null) {
-        // Decode using the proper flags
         val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
-        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        val bitmap = android.graphics.BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
         return bitmap?.asImageBitmap()
     }
     return null
 }
 
-// Composable that takes in an ImageBitmap and displays it
+/**
+ * Displays the claim image by downloading & decoding it into an ImageBitmap.
+ */
 @Composable
-fun DisplayClaimImage(bitmap: ImageBitmap?) {
-    if (bitmap != null) {
+fun DisplayClaimImage(fileName: String, context: Context) {
+    val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
+
+    // This effect fetches/decodes the image once, whenever fileName changes
+    LaunchedEffect(fileName) {
+        val bitmap = generateClaimBitmap(fileName, context)
+        imageBitmap.value = bitmap
+    }
+
+    if (imageBitmap.value != null) {
         Image(
-            bitmap = bitmap,
+            bitmap = imageBitmap.value!!,
             contentDescription = "Claim Photo",
             modifier = Modifier
                 .fillMaxWidth()
@@ -282,11 +295,3 @@ fun DisplayClaimImage(bitmap: ImageBitmap?) {
         }
     }
 }
-
-
-
-
-
-
-
-

@@ -16,9 +16,11 @@ class ClaimInfoViewModel : ViewModel() {
         private set
     var status = mutableStateOf("Pending")
         private set
-    // The photo variable now stores the URI (as string) returned from the decoded file.
+
+    // Store the full Uri (content://...) so we can display and read from it.
     var photo = mutableStateOf("")
         private set
+
     var isEditMode = mutableStateOf(false)
         private set
 
@@ -29,7 +31,7 @@ class ClaimInfoViewModel : ViewModel() {
         description.value = claim.claimDes
         location.value = claim.claimLocation
         status.value = claim.claimStatus
-        // Clear any previous value – we’ll fetch the updated photo from the server.
+        // We'll fetch the new photo from server if needed; clear existing:
         photo.value = ""
         isEditMode.value = true
     }
@@ -50,18 +52,21 @@ class ClaimInfoViewModel : ViewModel() {
         status.value = newStatus
     }
 
-    fun onPhotoChanged(newPhoto: String) {
-        photo.value = newPhoto
+    fun onPhotoChanged(newPhotoUri: String) {
+        photo.value = newPhotoUri
     }
 
-    // Function to fetch the Base64 string from the server, decode it and update photo state.
+    /**
+     *  Download the base64 from server, decode to an actual file in cache, then set photo.value to content://...
+     *  so we can display it easily in Compose.
+     */
     fun fetchPhoto(context: Context, fileName: String) {
         viewModelScope.launch {
             val base64String = getMethodDownloadPhoto(context, fileName)
             base64String?.let {
                 val uri = decodeBase64ToUri(context, it, fileName)
                 uri?.let { decodedUri ->
-                    onPhotoChanged(decodedUri.toString())
+                    onPhotoChanged(decodedUri.toString())  // store the full content:// path
                 }
             }
         }

@@ -46,36 +46,3 @@ fun MapScreen(modifier: Modifier) {
     }
 }
 
-@Composable
-fun DisplayClaimImage(fileName: String, context: Context){
-    var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(fileName) {
-        val base64String = getMethodDownloadPhoto(context, fileName)
-        println("Base64 Stringg: $base64String")
-        if (base64String != null) {
-            println("Base64 String INSIDE IF: $base64String")
-            val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
-            println("Image Bytes: $imageBytes")
-            val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-            println("Bitmap: $bitmap")
-            imageBitmap = bitmap?.asImageBitmap()
-        }
-    }
-    if (imageBitmap != null) {
-        Image(
-            bitmap = imageBitmap!!,
-            contentDescription = "Claim Photo",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-
-        //return imageBitmap!!
-    } else {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .height(200.dp)) {
-            Text("Loading image...")
-        }
-    }
-}
