@@ -1,52 +1,46 @@
 package com.example.in5600_project.presentation.ui.screens
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
-import com.example.in5600_project.navigation.*
-import androidx.compose.foundation.pager.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimInformation
-import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
+
 
 @Composable
-fun ClaimsHomeScreen(modifier: Modifier = Modifier, navController: NavController, myProfileViewModel: MyProfileViewModel, claims: List<ClaimInformation>) {
-    Scaffold(
-        bottomBar = { AppBottomBar(navController) }
-    ) { innerPadding ->
-        Box(modifier = modifier.padding(innerPadding)) {
-            Text("Welcome to Home")
+fun ClaimsHomeScreen(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    claims: List<ClaimInformation>
+) {
+
+
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        Button(
+            onClick = { navController.navigate("newClaimScreen") },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text("Add New Claim")
         }
-        SwipeScreens(modifier, innerPadding, myProfileViewModel, navController, claims)
-    }
-}
 
-@Composable
-fun SwipeScreens(modifier: Modifier, padding: PaddingValues, myProfileViewModel: MyProfileViewModel, navController: NavController, claims: List<ClaimInformation>) {
-    val pagerState = rememberPagerState(pageCount = { 2 })
-    //val userId by myProfileViewModel.currentUserId.collectAsState()
+        Spacer(modifier = Modifier.height(16.dp))
 
-
-    HorizontalPager(
-        state = pagerState,
-        modifier = Modifier.fillMaxSize()
-    ) { page ->
-        when (page) {
-            0 -> {
-                // Map screen
-                MapScreen(modifier = modifier)
-            }
-            1 -> {
-                // Cards screen
-                ClaimCardScreen(modifier = modifier, navController = navController,claims = claims)
-            }
-        }
+        // ClaimsListScreen to display the list of claims.
+        ClaimsListScreen(
+            claims = claims,
+            navController = navController
+        )
     }
 }

@@ -60,7 +60,6 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
             ClaimsHomeScreen(
                 modifier = modifier,
                 navController = navController,
-                myProfileViewModel = myProfileViewModel,
                 claims = claims
             )
         }

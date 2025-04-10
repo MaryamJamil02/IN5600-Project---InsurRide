@@ -180,7 +180,7 @@ fun ClaimInfoScreen(
                 onClick = { launcher.launch("image/*") },
                 modifier = modifier.fillMaxWidth()
             ) {
-                Text("Select Photo")
+                Text("Change Photo")
             }
 
             // Preview the newly selected image
