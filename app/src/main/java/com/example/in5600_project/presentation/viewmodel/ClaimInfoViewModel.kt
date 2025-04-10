@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.data.network.getMethodDownloadPhoto
-import com.example.in5600_project.util.decodeBase64ToUri
+import com.example.in5600_project.utils.decodeBase64ToUri
 import kotlinx.coroutines.launch
 
 class ClaimInfoViewModel : ViewModel() {

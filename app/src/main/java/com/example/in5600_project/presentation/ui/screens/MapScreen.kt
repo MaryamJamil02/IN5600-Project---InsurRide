@@ -1,6 +1,7 @@
 package com.example.in5600_project.presentation.ui.screens
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
@@ -46,7 +47,7 @@ fun MapScreen(modifier: Modifier) {
 }
 
 @Composable
-fun DisplayClaimImage(fileName: String, context: Context) {
+fun DisplayClaimImage(fileName: String, context: Context){
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(fileName) {
         val base64String = getMethodDownloadPhoto(context, fileName)
@@ -68,6 +69,8 @@ fun DisplayClaimImage(fileName: String, context: Context) {
                 .fillMaxWidth()
                 .height(200.dp)
         )
+
+        //return imageBitmap!!
     } else {
         Box(modifier = Modifier
             .fillMaxWidth()

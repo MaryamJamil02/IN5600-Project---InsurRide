@@ -1,10 +1,14 @@
 package com.example.in5600_project.presentation.ui.screens
 
+import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -18,6 +22,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
@@ -25,10 +31,13 @@ import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
+import com.example.in5600_project.data.network.getMethodDownloadPhoto
+import com.example.in5600_project.data.network.postMethodUploadPhoto
 import com.example.in5600_project.data.network.postUpdateClaim
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ClaimInfoScreen(
     modifier: Modifier,
@@ -48,8 +57,9 @@ fun ClaimInfoScreen(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         // You can update the photo state here if you allow selecting a new image.
-        // For example: uri?.let { viewModel.onPhotoChanged(it.toString()) }
+        uri?.let { viewModel.onPhotoChanged(it.toString()) }
     }
+
 
     // In view mode, trigger fetching of the photo using its file name.
     LaunchedEffect(claim.claimPhoto) {
@@ -71,6 +81,9 @@ fun ClaimInfoScreen(
             )
             Spacer(modifier = modifier.height(4.dp))
 
+            /*coroutineScope.launch {
+                generateClaimBitmap(claim.claimPhoto, context)
+            }*/
             DisplayClaimImage(claim.claimPhoto, context)
 
             Spacer(modifier = modifier.height(8.dp))
@@ -194,6 +207,14 @@ fun ClaimInfoScreen(
                         updateClaimStatus = viewModel.status.value
                     )
 
+                    val responseUpdatePhoto = postMethodUploadPhoto(
+                        context = context,
+                        userId = userId,
+                        claimId = claim.claimId,
+                        fileName = viewModel.photo.value,
+                        imageUri = Uri.parse(viewModel.photo.value)
+                    )
+
                     if (responseUpdatedClaim != null) {
                         // Update the claim in your DataStore.
                         val updatedClaim = ClaimInformation(
@@ -227,3 +248,45 @@ fun ClaimInfoScreen(
         }
     }
 }
+
+suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap? {
+    // Assume getMethodDownloadPhoto(context, fileName) is defined elsewhere
+    val base64String = getMethodDownloadPhoto(context, fileName)
+    if (base64String != null) {
+        // Decode using the proper flags
+        val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
+        val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        return bitmap?.asImageBitmap()
+    }
+    return null
+}
+
+// Composable that takes in an ImageBitmap and displays it
+@Composable
+fun DisplayClaimImage(bitmap: ImageBitmap?) {
+    if (bitmap != null) {
+        Image(
+            bitmap = bitmap,
+            contentDescription = "Claim Photo",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        )
+    } else {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+        ) {
+            Text("Loading image...")
+        }
+    }
+}
+
+
+
+
+
+
+
+
