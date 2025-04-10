@@ -11,12 +11,17 @@ class ClaimInfoViewModel : ViewModel() {
         private set
     var location = mutableStateOf("")
         private set
-    var status = mutableStateOf("")
+    var status = mutableStateOf("Pending")
         private set
     var photo = mutableStateOf("")
         private set
     var isEditMode = mutableStateOf(false)
         private set
+
+
+    // List of available status options.
+    val statusOptions = listOf("Pending", "Approved", "Rejected")
+
 
     fun enterEditMode(claim: ClaimInformation) {
         //claimId.value = claim.claimId

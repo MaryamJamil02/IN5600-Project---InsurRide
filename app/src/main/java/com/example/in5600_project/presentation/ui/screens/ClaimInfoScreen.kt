@@ -1,12 +1,21 @@
 package com.example.in5600_project.presentation.ui.screens
 
 import android.content.Context
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,6 +39,15 @@ fun ClaimInfoScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val claimsManager = ClaimsManager(context)
+
+    var expanded by remember { mutableStateOf(false) }
+
+    // Launcher to pick an image from the gallery
+    val launcher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        //viewModel.onPhotoChanged(uri)
+    }
 
     if (!viewModel.isEditMode.value) {
         // View mode: show claim details and an "Edit Claim" button.
@@ -102,12 +120,63 @@ fun ClaimInfoScreen(
                 modifier = modifier.fillMaxWidth()
             )
             Spacer(modifier = modifier.height(8.dp))
-            OutlinedTextField(
-                value = viewModel.status.value,
-                onValueChange = { viewModel.onStatusChanged(it) },
-                label = { Text("Status") },
+
+            // Dropdown for Status
+            Box(modifier = modifier.fillMaxWidth()) {
+                OutlinedTextField(
+                    value = viewModel.status.value,
+                    onValueChange = {},
+                    label = { Text("Status") },
+                    modifier = modifier.fillMaxWidth(),
+                    readOnly = true,
+                    trailingIcon = {
+                        IconButton(onClick = { expanded = true }) {
+                            Icon(
+                                imageVector = Icons.Default.ArrowDropDown,
+                                contentDescription = "Select Status"
+                            )
+                        }
+                    }
+                )
+                DropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                    modifier = modifier.fillMaxWidth()
+                ) {
+                    viewModel.statusOptions.forEach { status ->
+                        DropdownMenuItem(
+                            text = { Text(status) },
+                            onClick = {
+                                viewModel.onStatusChanged(status)
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+            }
+            Spacer(modifier = modifier.height(16.dp))
+
+            // Button to select a photo from the gallery
+            Button(
+                onClick = { launcher.launch("image/*") },
                 modifier = modifier.fillMaxWidth()
-            )
+            ) {
+                Text("Select Photo")
+            }
+
+            // Display a preview of the selected image, if available
+            viewModel.photo.value.let { uri ->
+                AsyncImage(
+                    model = uri,
+                    contentDescription = "Selected Photo",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                )
+            }
+
+
+
             Spacer(modifier = modifier.height(16.dp))
             Button(onClick = {
                 // Implement update logic (e.g., update the claim in your DataStore and on the server)
