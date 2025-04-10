@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.datastore.ClaimInformation
 import kotlinx.coroutines.launch
@@ -24,7 +25,8 @@ fun NewClaimButton(
     newClaimPhoto: String,
     newClaimLocation: String,
     newClaimStatus: String,
-    imageUri : Uri
+    imageUri : Uri,
+    navController: NavController
 ) {
     val context = LocalContext.current
     val claimsManager = ClaimsManager(context)
@@ -80,6 +82,9 @@ fun NewClaimButton(
 
                     Toast.makeText(context, "New claim added successfully", Toast.LENGTH_SHORT)
                         .show()
+
+                    navController.navigate("claimInfoScreen/${numberOfClaims}")
+
                 } else {
                     Toast.makeText(context, "Failed to add new claim", Toast.LENGTH_SHORT).show()
                 }

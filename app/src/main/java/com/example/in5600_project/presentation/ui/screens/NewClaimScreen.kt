@@ -137,7 +137,8 @@ fun NewClaimScreen(
                 newClaimPhoto = cleanedFileName,
                 newClaimLocation = location,
                 newClaimStatus = selectedStatus,
-                imageUri = imageUri
+                imageUri = imageUri,
+                navController = navController
             )
         }
     }
