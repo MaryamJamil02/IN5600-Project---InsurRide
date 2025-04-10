@@ -70,13 +70,9 @@ fun ClaimInfoScreen(
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = modifier.height(4.dp))
-            AsyncImage(
-                model = if (viewModel.photo.value.isNotEmpty()) viewModel.photo.value else null,
-                contentDescription = "Claim Photo",
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
+
+            DisplayClaimImage(claim.claimPhoto, context)
+
             Spacer(modifier = modifier.height(8.dp))
             Text(
                 text = "Status: ${claim.claimStatus}",
