@@ -1,10 +1,17 @@
 package com.example.in5600_project.presentation.ui.screens
 
+//LATERFIX - use * instead
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
@@ -21,7 +28,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -39,13 +45,14 @@ fun NewClaimScreen(
 ) {
     var expanded by remember { mutableStateOf(false) }
     val userId by myProfileViewModel.currentUserId.collectAsState()
-    val context = LocalContext.current
+
 
     val description = claimViewModel.description.value
     val location = claimViewModel.location.value
     val selectedStatus = claimViewModel.selectedStatus.value
     val statusOptions = claimViewModel.statusOptions
     val imageUri = claimViewModel.imageUri.value
+
 
     // Launcher to pick an image from the gallery
     val launcher = rememberLauncherForActivityResult(
@@ -54,9 +61,9 @@ fun NewClaimScreen(
         claimViewModel.onImageUriChanged(uri)
     }
 
-    // Get the cleaned file name using lastPathSegment and substringBeforeLast.
-    val cleanedFileName = imageUri?.lastPathSegment?.substringBeforeLast(".") ?: ""
-    println("Selected image filename (cleaned): $cleanedFileName")
+    // Extract the filename from imageUri
+    val imageFileName = imageUri?.lastPathSegment ?: ""
+    println("Selected image filename: $imageFileName")
 
     Column(
         modifier = Modifier
@@ -64,6 +71,7 @@ fun NewClaimScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
         // Description.
         OutlinedTextField(
             value = description,
@@ -71,14 +79,16 @@ fun NewClaimScreen(
             label = { Text("Description") },
             modifier = modifier.fillMaxWidth()
         )
-        // Location.
+
+        // Location
         OutlinedTextField(
             value = location,
             onValueChange = { claimViewModel.onLocationChanged(it) },
             label = { Text("Location") },
             modifier = modifier.fillMaxWidth()
         )
-        // Dropdown for Status.
+
+        // Dropdown for Status
         Box(modifier = modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = selectedStatus,
@@ -111,14 +121,16 @@ fun NewClaimScreen(
                 }
             }
         }
-        // Button to select a photo from the gallery.
+
+        // Button to select a photo from the gallery
         Button(
             onClick = { launcher.launch("image/*") },
             modifier = modifier.fillMaxWidth()
         ) {
             Text("Select Photo")
         }
-        // Display a preview of the selected image, if available.
+
+        // Display a preview of the selected image, if it's available
         imageUri?.let { uri ->
             Image(
                 painter = rememberAsyncImagePainter(model = uri),
@@ -127,14 +139,14 @@ fun NewClaimScreen(
                     .fillMaxWidth()
                     .height(200.dp)
             )
-            Text("Filename: $cleanedFileName")
         }
-        // Pass the cleaned filename to the NewClaimButton.
-        if (imageUri != null && cleanedFileName.isNotEmpty()) {
+
+        // Pass the image filename to the NewClaimButton.
+        if (imageUri != null) {
             NewClaimButton(
                 userId = userId,
                 newClaimDescription = description,
-                newClaimPhoto = cleanedFileName,
+                newClaimPhoto = imageFileName,
                 newClaimLocation = location,
                 newClaimStatus = selectedStatus,
                 imageUri = imageUri

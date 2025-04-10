@@ -260,7 +260,7 @@ fun DisplayClaimImage(fileName: String, context: Context) {
         println("Base64 Stringg: $base64String")
         if (base64String != null) {
 
-            val imageBytes = Base64.decode(base64String, Base64.NO_WRAP)
+            val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
             println("Image Bytes: $imageBytes")
             val bitmap = BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
             println("Bitmap: $bitmap")
