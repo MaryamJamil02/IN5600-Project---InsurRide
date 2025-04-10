@@ -11,6 +11,7 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,11 +43,19 @@ fun ClaimInfoScreen(
 
     var expanded by remember { mutableStateOf(false) }
 
-    // Launcher to pick an image from the gallery
+    // Launcher to pick an image from the gallery – available in edit mode.
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        //viewModel.onPhotoChanged(uri)
+        // You can update the photo state here if you allow selecting a new image.
+        // For example: uri?.let { viewModel.onPhotoChanged(it.toString()) }
+    }
+
+    // In view mode, trigger fetching of the photo using its file name.
+    LaunchedEffect(claim.claimPhoto) {
+        if (!viewModel.isEditMode.value && claim.claimPhoto.isNotEmpty()) {
+            viewModel.fetchPhoto(context, claim.claimPhoto)
+        }
     }
 
     if (!viewModel.isEditMode.value) {
@@ -62,14 +71,13 @@ fun ClaimInfoScreen(
             )
             Spacer(modifier = modifier.height(4.dp))
             AsyncImage(
-                model = claim.claimPhoto,
+                model = if (viewModel.photo.value.isNotEmpty()) viewModel.photo.value else null,
                 contentDescription = "Claim Photo",
                 modifier = modifier
                     .fillMaxWidth()
                     .height(200.dp)
             )
             Spacer(modifier = modifier.height(8.dp))
-
             Text(
                 text = "Status: ${claim.claimStatus}",
                 style = MaterialTheme.typography.bodyMedium
@@ -87,6 +95,8 @@ fun ClaimInfoScreen(
             Spacer(modifier = modifier.height(16.dp))
             Button(onClick = {
                 viewModel.enterEditMode(claim)
+                // Also fetch the photo in edit mode if necessary.
+                viewModel.fetchPhoto(context, claim.claimPhoto)
             }) {
                 Text("Edit Claim")
             }
@@ -99,7 +109,7 @@ fun ClaimInfoScreen(
                 .padding(16.dp)
         ) {
             AsyncImage(
-                model = viewModel.photo.value,
+                model = if (viewModel.photo.value.isNotEmpty()) viewModel.photo.value else null,
                 contentDescription = "Claim Photo",
                 modifier = modifier
                     .fillMaxWidth()
@@ -120,7 +130,6 @@ fun ClaimInfoScreen(
                 modifier = modifier.fillMaxWidth()
             )
             Spacer(modifier = modifier.height(8.dp))
-
             // Dropdown for Status
             Box(modifier = modifier.fillMaxWidth()) {
                 OutlinedTextField(
@@ -155,31 +164,26 @@ fun ClaimInfoScreen(
                 }
             }
             Spacer(modifier = modifier.height(16.dp))
-
-            // Button to select a photo from the gallery
+            // Button to select a photo from the gallery in edit mode.
             Button(
                 onClick = { launcher.launch("image/*") },
                 modifier = modifier.fillMaxWidth()
             ) {
                 Text("Select Photo")
             }
-
-            // Display a preview of the selected image, if available
-            viewModel.photo.value.let { uri ->
+            // Display a preview of the selected image, if available.
+            if (viewModel.photo.value.isNotEmpty()) {
                 AsyncImage(
-                    model = uri,
+                    model = viewModel.photo.value,
                     contentDescription = "Selected Photo",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
                 )
             }
-
-
-
             Spacer(modifier = modifier.height(16.dp))
             Button(onClick = {
-                // Implement update logic (e.g., update the claim in your DataStore and on the server)
+                // Implement update logic (update the claim locally and on the server).
                 coroutineScope.launch {
                     val numberOfClaims = claimsManager.getNumberOfClaims(userId).first()
 
@@ -188,14 +192,14 @@ fun ClaimInfoScreen(
                         userId = userId,
                         indexUpdateClaim = claim.claimId,
                         updateClaimDescription = viewModel.description.value,
-                        updateClaimPhoto = viewModel.photo.value, // LATERFIX
+                        // This photo now is the URI string obtained from decoding the Base64.
+                        updateClaimPhoto = viewModel.photo.value,
                         updateClaimLocation = viewModel.location.value,
                         updateClaimStatus = viewModel.status.value
                     )
 
                     if (responseUpdatedClaim != null) {
-                        // Update the claim in your DataStore
-                        // Create a new ClaimInformation object.
+                        // Update the claim in your DataStore.
                         val updatedClaim = ClaimInformation(
                             claimId = claim.claimId,
                             claimDes = viewModel.description.value,
@@ -204,7 +208,6 @@ fun ClaimInfoScreen(
                             claimStatus = viewModel.status.value
                         )
 
-                        // Insert the new claim locally.
                         claimsManager.updateOrInsertClaimAtIndex(
                             userId,
                             claim.claimId.toInt(),
@@ -228,7 +231,3 @@ fun ClaimInfoScreen(
         }
     }
 }
-
-
-
-

@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -88,7 +89,7 @@ fun NewClaimScreen(
         )
 
         // Dropdown for Status
-        androidx.compose.foundation.layout.Box(modifier = modifier.fillMaxWidth()) {
+        Box(modifier = modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = selectedStatus,
                 onValueChange = {},
@@ -141,12 +142,15 @@ fun NewClaimScreen(
         }
 
         // Pass the image filename to the NewClaimButton.
-        NewClaimButton(
-            userId = userId,
-            newClaimDescription = description,
-            newClaimPhoto = imageFileName,
-            newClaimLocation = location,
-            newClaimStatus = selectedStatus
-        )
+        if (imageUri != null) {
+            NewClaimButton(
+                userId = userId,
+                newClaimDescription = description,
+                newClaimPhoto = imageFileName,
+                newClaimLocation = location,
+                newClaimStatus = selectedStatus,
+                imageUri = imageUri
+            )
+        }
     }
 }

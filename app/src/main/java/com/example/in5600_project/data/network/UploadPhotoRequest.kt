@@ -50,7 +50,7 @@ fun convertImageUriToBase64(context: Context, imageUri: Uri): String? {
         val bytes = inputStream?.readBytes()
         inputStream?.close()
         return if (bytes != null) {
-            Base64.encodeToString(bytes, Base64.NO_WRAP)
+            Base64.encodeToString(bytes, Base64.NO_WRAP or Base64.URL_SAFE)
         } else {
             null
         }
