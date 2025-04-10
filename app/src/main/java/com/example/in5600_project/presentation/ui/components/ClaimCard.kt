@@ -10,8 +10,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.example.in5600_project.presentation.ui.screens.DisplayClaimImage
 
 @Composable
 fun ClaimCard(
@@ -19,6 +22,8 @@ fun ClaimCard(
     onClickPhoto: () -> Unit = {},
     navController: NavController
 ) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,11 +46,14 @@ fun ClaimCard(
 
             Spacer(modifier = Modifier.height(4.dp))
 
-            Text(
+            DisplayClaimImage(claim.claimPhoto, context)
+
+
+            /*Text(
                 text = "Photo: ${claim.claimPhoto}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.clickable { onClickPhoto() }
-            )
+            )*/
         }
     }
 }
