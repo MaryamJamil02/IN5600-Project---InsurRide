@@ -71,6 +71,8 @@ fun ClaimInfoScreen(
                 .padding(16.dp)
         ) {
 
+            Text("Claim Information", modifier = modifier.padding(16.dp))
+
             Spacer(modifier = modifier.height(30.dp))
             GoBackButton(navController, isPopBackStack = false)
             Spacer(modifier = modifier.height(15.dp))
@@ -118,6 +120,8 @@ fun ClaimInfoScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+
+            Text("Edit Claim Information", modifier = modifier.padding(16.dp))
 
             Spacer(modifier = modifier.height(30.dp))
 

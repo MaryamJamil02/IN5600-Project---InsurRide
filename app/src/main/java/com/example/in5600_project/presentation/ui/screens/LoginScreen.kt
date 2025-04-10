@@ -37,6 +37,9 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+
+            Text("Login")
+
             //Email
             OutlinedTextField(
                 modifier = modifier,

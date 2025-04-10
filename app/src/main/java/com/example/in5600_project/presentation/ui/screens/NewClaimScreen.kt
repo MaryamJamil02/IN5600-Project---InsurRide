@@ -66,6 +66,8 @@ fun NewClaimScreen(
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
 
+        Text("Add New Claim", modifier = modifier.padding(16.dp))
+
 
         Spacer(modifier = modifier.height(30.dp))
 

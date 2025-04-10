@@ -15,7 +15,6 @@ import com.example.in5600_project.presentation.ui.components.ClaimCard
 @Composable
 fun ClaimsListScreen(
     claims: List<ClaimInformation>,
-    onPhotoClick: (ClaimInformation) -> Unit = {},
     navController: NavController
 ) {
     LazyColumn(
@@ -27,7 +26,6 @@ fun ClaimsListScreen(
         items(claims) { claim ->
             ClaimCard(
                 claim = claim,
-                onClickPhoto = { onPhotoClick(claim) },
                 navController = navController
             )
         }

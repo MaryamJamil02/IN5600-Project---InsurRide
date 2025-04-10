@@ -19,7 +19,6 @@ import com.example.in5600_project.presentation.ui.screens.DisplayClaimImage
 @Composable
 fun ClaimCard(
     claim: ClaimInformation,
-    onClickPhoto: () -> Unit = {},
     navController: NavController
 ) {
     val context = LocalContext.current
