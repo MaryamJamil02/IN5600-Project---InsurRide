@@ -42,7 +42,7 @@ fun ChangePasswordScreen(
     )
     {
 
-        GoBackButton(navController)
+        GoBackButton(navController, isPopBackStack = true)
 
         // Create new password
         OutlinedTextField(

@@ -40,4 +40,14 @@ class ClaimViewModel : ViewModel() {
     fun onImageUriChanged(newUri: Uri?) {
         imageUri.value = newUri
     }
+
+    fun reset() {
+        // Return everything to its default
+        description.value = ""
+        location.value = ""
+        selectedStatus.value = "Pending"
+        imageUri.value = null
+    }
 }
+
+

@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.in5600_project.presentation.ui.components.GoBackButton
 import com.example.in5600_project.presentation.ui.components.NewClaimButton
 import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
@@ -64,6 +65,13 @@ fun NewClaimScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+
+
+        Spacer(modifier = modifier.height(30.dp))
+
+        GoBackButton(navController, onReset = { claimViewModel.reset() }, isPopBackStack = false)
+        Spacer(modifier = modifier.height(15.dp))
+
         // Description.
         OutlinedTextField(
             value = description,
@@ -138,7 +146,8 @@ fun NewClaimScreen(
                 newClaimLocation = location,
                 newClaimStatus = selectedStatus,
                 imageUri = imageUri,
-                navController = navController
+                navController = navController,
+                viewModel = claimViewModel
             )
         }
     }

@@ -8,8 +8,18 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 
 @Composable
-fun GoBackButton(navController: NavController) {
-    IconButton(onClick = { navController.popBackStack() }) {
+fun GoBackButton(navController: NavController, onReset: () -> Unit = {}, isPopBackStack : Boolean) {
+    IconButton(onClick = {
+        onReset()
+
+        if (isPopBackStack) {
+            navController.popBackStack()
+        }
+        else {
+            navController.navigate("claimsHomeScreen")
+        }
+
+    }) {
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
             contentDescription = "Go Back"

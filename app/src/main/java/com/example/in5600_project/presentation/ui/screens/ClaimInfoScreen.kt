@@ -27,6 +27,7 @@ import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.network.getMethodDownloadPhoto
 import com.example.in5600_project.data.network.postMethodUploadPhoto
 import com.example.in5600_project.data.network.postUpdateClaim
+import com.example.in5600_project.presentation.ui.components.GoBackButton
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -69,14 +70,16 @@ fun ClaimInfoScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+
+            Spacer(modifier = modifier.height(30.dp))
+            GoBackButton(navController, isPopBackStack = false)
+            Spacer(modifier = modifier.height(15.dp))
+
             Text(
                 text = "Claim ID: ${claim.claimId}",
                 style = MaterialTheme.typography.titleMedium
             )
-            Spacer(modifier = modifier.height(4.dp))
 
-            // Show the claim image. Typically you'd fetch from server + decode to show it.
-            DisplayClaimImage(claim.claimPhoto, context)
 
             Spacer(modifier = modifier.height(8.dp))
             Text(
@@ -95,6 +98,9 @@ fun ClaimInfoScreen(
             )
             Spacer(modifier = modifier.height(16.dp))
 
+            // Show the claim image. Typically you'd fetch from server + decode to show it.
+            DisplayClaimImage(claim.claimPhoto, context)
+
             Button(onClick = {
                 viewModel.enterEditMode(claim)
                 // Also fetch the photo in edit mode if necessary.
@@ -112,6 +118,11 @@ fun ClaimInfoScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+
+            Spacer(modifier = modifier.height(30.dp))
+
+            GoBackButton(navController, onReset= { viewModel.exitEditMode() }, isPopBackStack = false)
+            Spacer(modifier = modifier.height(15.dp))
 
             OutlinedTextField(
                 value = viewModel.description.value,
