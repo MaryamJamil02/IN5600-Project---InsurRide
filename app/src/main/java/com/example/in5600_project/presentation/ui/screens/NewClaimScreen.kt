@@ -1,11 +1,6 @@
 package com.example.in5600_project.presentation.ui.screens
 
-//LATERFIX - use * instead
-import android.annotation.SuppressLint
-import android.content.Context
 import android.net.Uri
-import android.provider.OpenableColumns
-import android.util.Base64
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -34,7 +29,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.in5600_project.presentation.ui.components.NewClaimButton
 import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
-import java.io.InputStream
 
 @Composable
 fun NewClaimScreen(
@@ -47,13 +41,11 @@ fun NewClaimScreen(
     val userId by myProfileViewModel.currentUserId.collectAsState()
     val context = LocalContext.current
 
-
     val description = claimViewModel.description.value
     val location = claimViewModel.location.value
     val selectedStatus = claimViewModel.selectedStatus.value
     val statusOptions = claimViewModel.statusOptions
     val imageUri = claimViewModel.imageUri.value
-
 
     // Launcher to pick an image from the gallery
     val launcher = rememberLauncherForActivityResult(
@@ -62,9 +54,9 @@ fun NewClaimScreen(
         claimViewModel.onImageUriChanged(uri)
     }
 
-    // Extract the filename from imageUri
-    val imageFileName = imageUri?.lastPathSegment ?: ""
-    println("Selected image filename: $imageFileName")
+    // Get the cleaned file name using lastPathSegment and substringBeforeLast.
+    val cleanedFileName = imageUri?.lastPathSegment?.substringBeforeLast(".") ?: ""
+    println("Selected image filename (cleaned): $cleanedFileName")
 
     Column(
         modifier = Modifier
@@ -72,7 +64,6 @@ fun NewClaimScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-
         // Description.
         OutlinedTextField(
             value = description,
@@ -80,16 +71,14 @@ fun NewClaimScreen(
             label = { Text("Description") },
             modifier = modifier.fillMaxWidth()
         )
-
-        // Location
+        // Location.
         OutlinedTextField(
             value = location,
             onValueChange = { claimViewModel.onLocationChanged(it) },
             label = { Text("Location") },
             modifier = modifier.fillMaxWidth()
         )
-
-        // Dropdown for Status
+        // Dropdown for Status.
         Box(modifier = modifier.fillMaxWidth()) {
             OutlinedTextField(
                 value = selectedStatus,
@@ -122,16 +111,14 @@ fun NewClaimScreen(
                 }
             }
         }
-
-        // Button to select a photo from the gallery
+        // Button to select a photo from the gallery.
         Button(
             onClick = { launcher.launch("image/*") },
             modifier = modifier.fillMaxWidth()
         ) {
             Text("Select Photo")
         }
-
-        // Display a preview of the selected image, if it's available
+        // Display a preview of the selected image, if available.
         imageUri?.let { uri ->
             Image(
                 painter = rememberAsyncImagePainter(model = uri),
@@ -140,20 +127,14 @@ fun NewClaimScreen(
                     .fillMaxWidth()
                     .height(200.dp)
             )
-
-            Text("Filename$imageFileName")
-
+            Text("Filename: $cleanedFileName")
         }
-
-
-
-
-        // Pass the image filename to the NewClaimButton.
-        if (imageUri != null) {
+        // Pass the cleaned filename to the NewClaimButton.
+        if (imageUri != null && cleanedFileName.isNotEmpty()) {
             NewClaimButton(
                 userId = userId,
                 newClaimDescription = description,
-                newClaimPhoto = getFileName1(context, imageUri)!!,
+                newClaimPhoto = cleanedFileName,
                 newClaimLocation = location,
                 newClaimStatus = selectedStatus,
                 imageUri = imageUri
@@ -161,22 +142,3 @@ fun NewClaimScreen(
         }
     }
 }
-
-@SuppressLint("Range")
-fun getFileName1(context: Context, uri: Uri): String? {
-    var fileName: String? = null
-    // Query the content resolver for the display name
-    val cursor = context.contentResolver.query(uri, null, null, null, null)
-    cursor?.use {
-        if (it.moveToFirst()) {
-            fileName = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-        }
-    }
-    // Fallback: extract file name from the URI's path if the content resolver did not return one
-    if (fileName == null) {
-        fileName = uri.path?.substringAfterLast('/')
-    }
-    return fileName
-}
-
-
