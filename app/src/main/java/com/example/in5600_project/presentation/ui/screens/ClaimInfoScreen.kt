@@ -113,23 +113,18 @@ fun ClaimInfoScreen(
             }
             item {
                 // Fixed height for the map preview
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp),
-                    contentAlignment = androidx.compose.ui.Alignment.Center
-                ) {
-                    if (isValidLatLon(coordinates)) {
-                        val parts: List<String> = coordinates.split(",")
-                        val lat = parts[0].trim().toDouble()
-                        val long = parts[1].trim().toDouble()
 
-                        // Non-interactive map
-                        MapBox(lat, long, false)
-                    } else {
-                        Text("Invalid coordinates")
-                    }
+                if (isValidLatLon(coordinates)) {
+                    val parts: List<String> = coordinates.split(",")
+                    val lat = parts[0].trim().toDouble()
+                    val long = parts[1].trim().toDouble()
+
+                    // Non-interactive map
+                    MapBox(lat, long, false)
+                } else {
+                    MapBox(null, null, false)
                 }
+
             }
             item {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -196,23 +191,23 @@ fun ClaimInfoScreen(
                     val lat = parts[0].trim().toDouble()
                     val long = parts[1].trim().toDouble()
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    ) {
-                        // Pass a callback to update the location in the ViewModel when the user taps the map
-                        MapBox(
-                            latitude = lat,
-                            longitude = long,
-                            interactive = true
-                        ) { newLat, newLong ->
-                            // Whenever the user taps, store these new coords
-                            viewModel.onLocationChanged("$newLat, $newLong")
-                        }
+
+                    // Pass a callback to update the location in the ViewModel when the user taps the map
+                    MapBox(
+                        initialLatitude = lat,
+                        initialLongitude = long,
+                        interactive = true
+                    ) { newLat, newLong ->
+                        // Whenever the user taps, store the new coordinates
+                        viewModel.onLocationChanged("$newLat, $newLong")
                     }
+
                 } else {
-                    Text("Invalid coordinates")
+                    MapBox(null, null, true) { newLat, newLong ->
+                        // Whenever the user taps, store the new coordinates
+                        viewModel.onLocationChanged("$newLat, $newLong")
+                    }
+
                 }
             }
             item {
@@ -325,13 +320,18 @@ fun ClaimInfoScreen(
                                 false
                             )
 
-                            Toast.makeText(context, "Claim updated successfully", Toast.LENGTH_SHORT)
+                            Toast.makeText(
+                                context,
+                                "Claim updated successfully",
+                                Toast.LENGTH_SHORT
+                            )
                                 .show()
 
                             navController.navigate("claimsHomeScreen")
                             viewModel.exitEditMode()
                         } else {
-                            Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     }
                 }) {
