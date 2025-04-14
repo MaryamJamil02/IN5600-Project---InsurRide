@@ -1,24 +1,20 @@
 package com.example.in5600_project.presentation.ui.components
 
-import android.content.Context
 import android.net.Uri
-import android.util.Base64
 import android.widget.Toast
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.datastore.ClaimInformation
 import kotlinx.coroutines.launch
 import com.example.in5600_project.data.network.postInsertNewClaim
 import com.example.in5600_project.data.network.postMethodUploadPhoto
-import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
+import com.example.in5600_project.presentation.viewmodel.NewClaimViewModel
 import kotlinx.coroutines.flow.first
-import java.io.InputStream
 
 @Composable
 fun NewClaimButton(
@@ -29,7 +25,7 @@ fun NewClaimButton(
     newClaimStatus: String,
     imageUri : Uri,
     navController: NavController,
-    viewModel: ClaimViewModel = viewModel()
+    viewModel: NewClaimViewModel
 
 ) {
     val context = LocalContext.current

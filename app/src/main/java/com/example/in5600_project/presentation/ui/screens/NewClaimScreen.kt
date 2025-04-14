@@ -23,19 +23,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.example.in5600_project.presentation.ui.components.GoBackButton
 import com.example.in5600_project.presentation.ui.components.NewClaimButton
-import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
+import com.example.in5600_project.presentation.viewmodel.NewClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 @Composable
 fun NewClaimScreen(
     modifier: Modifier = Modifier,
     navController: NavController,
-    claimViewModel: ClaimViewModel = viewModel(),
+    claimViewModel: NewClaimViewModel,
     myProfileViewModel: MyProfileViewModel,
 ) {
     var expanded by remember { mutableStateOf(false) }

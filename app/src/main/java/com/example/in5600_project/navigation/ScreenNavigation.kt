@@ -22,14 +22,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.presentation.ui.screens.ClaimInfoScreen
 import com.example.in5600_project.presentation.ui.screens.NewClaimScreen
 import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
-import com.example.in5600_project.presentation.viewmodel.ClaimViewModel
+import com.example.in5600_project.presentation.viewmodel.NewClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 
@@ -39,7 +38,7 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
 
     // Create one instance of the ViewModel at this higher level
     val myProfileViewModel: MyProfileViewModel = viewModel()
-    val claimViewModel: ClaimViewModel = viewModel()
+    val claimViewModel: NewClaimViewModel = viewModel()
     val context = LocalContext.current
     val claimsManager = remember { ClaimsManager(context) }
     val userId by myProfileViewModel.currentUserId.collectAsState()

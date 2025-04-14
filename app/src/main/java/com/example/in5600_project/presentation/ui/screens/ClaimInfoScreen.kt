@@ -9,6 +9,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
@@ -30,7 +31,6 @@ import com.example.in5600_project.data.network.postUpdateClaim
 import com.example.in5600_project.presentation.ui.components.GoBackButton
 import com.example.in5600_project.presentation.ui.components.MapBox
 import com.example.in5600_project.utils.isValidLatLon
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
@@ -53,7 +53,6 @@ fun ClaimInfoScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
-        // Save the full content:// URI into the ViewModel’s state so we can display it.
         uri?.let { viewModel.onPhotoChanged(it.toString()) }
     }
 
@@ -66,228 +65,278 @@ fun ClaimInfoScreen(
 
     if (!viewModel.isEditMode.value) {
         // --------------------------
-        // VIEW MODE
+        // VIEW MODE (using a LazyColumn)
         // --------------------------
-        Column(
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
-            Text("Claim Information", modifier = modifier.padding(16.dp))
-
-            Spacer(modifier = modifier.height(30.dp))
-            GoBackButton(navController, isPopBackStack = false)
-            Spacer(modifier = modifier.height(15.dp))
-
-            Text(
-                text = "Claim ID: ${claim.claimId}",
-                style = MaterialTheme.typography.titleMedium
-            )
-
-
-            Spacer(modifier = modifier.height(8.dp))
-            Text(
-                text = "Status: ${claim.claimStatus}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = modifier.height(4.dp))
-            Text(
-                text = "Description: ${claim.claimDes}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Spacer(modifier = modifier.height(4.dp))
-
-            Box(
-                modifier = modifier.padding(16.dp)
-            ){
-                // LATER FIX
-
-                if (isValidLatLon(coordinates)){
-                    val parts : List<String> = coordinates.split(",")
-                    val lat = parts[0].trim { it <= ' ' }.toDouble()
-                    val long = parts[1].trim { it <= ' ' }.toDouble()
-
-                    MapBox(lat,long)
-                }
-
-                else{
-                    Text("Invalid coordinates")
-                }
-
+            item {
+                Text("Claim Information", modifier = Modifier.padding(16.dp))
             }
+            item {
+                Spacer(modifier = Modifier.height(30.dp))
+            }
+            item {
+                GoBackButton(navController, isPopBackStack = false)
+            }
+            item {
+                Spacer(modifier = Modifier.height(15.dp))
+            }
+            item {
+                Text(
+                    text = "Claim ID: ${claim.claimId}",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                Text(
+                    text = "Status: ${claim.claimStatus}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+            item {
+                Text(
+                    text = "Description: ${claim.claimDes}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+            item {
+                // Fixed height for the map preview
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp),
+                    contentAlignment = androidx.compose.ui.Alignment.Center
+                ) {
+                    if (isValidLatLon(coordinates)) {
+                        val parts: List<String> = coordinates.split(",")
+                        val lat = parts[0].trim().toDouble()
+                        val long = parts[1].trim().toDouble()
 
-
-
-
-
-
-
-
-
-            Spacer(modifier = modifier.height(16.dp))
-
-            // Show the claim image. Typically you'd fetch from server + decode to show it.
-            DisplayClaimImage(claim.claimPhoto, context)
-
-            Button(onClick = {
-                viewModel.enterEditMode(claim)
-                // Also fetch the photo in edit mode if necessary.
-                viewModel.fetchPhoto(context, claim.claimPhoto)
-            }) {
-                Text("Edit Claim")
+                        // Non-interactive map
+                        MapBox(lat, long, false)
+                    } else {
+                        Text("Invalid coordinates")
+                    }
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                // Show the claim image
+                DisplayClaimImage(claim.claimPhoto, context)
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                Button(
+                    onClick = {
+                        viewModel.enterEditMode(claim)
+                        viewModel.fetchPhoto(context, claim.claimPhoto)
+                    }
+                ) {
+                    Text("Edit Claim")
+                }
             }
         }
     } else {
         // --------------------------
-        // EDIT MODE
+        // EDIT MODE (using a LazyColumn)
         // --------------------------
-        Column(
+        LazyColumn(
             modifier = modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
-            Text("Edit Claim Information", modifier = modifier.padding(16.dp))
-
-            Spacer(modifier = modifier.height(30.dp))
-
-            GoBackButton(navController, onReset= { viewModel.exitEditMode() }, isPopBackStack = false)
-            Spacer(modifier = modifier.height(15.dp))
-
-            OutlinedTextField(
-                value = viewModel.description.value,
-                onValueChange = { viewModel.onDescriptionChanged(it) },
-                label = { Text("Description") },
-                modifier = modifier.fillMaxWidth()
-            )
-            Spacer(modifier = modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = viewModel.location.value,
-                onValueChange = { viewModel.onLocationChanged(it) },
-                label = { Text("Location") },
-                modifier = modifier.fillMaxWidth()
-            )
-            Spacer(modifier = modifier.height(8.dp))
-
-            // Dropdown for Status
-            Box(modifier = modifier.fillMaxWidth()) {
+            item {
+                Text("Edit Claim Information", modifier = Modifier.padding(16.dp))
+            }
+            item {
+                Spacer(modifier = Modifier.height(30.dp))
+            }
+            item {
+                GoBackButton(
+                    navController,
+                    onReset = { viewModel.exitEditMode() },
+                    isPopBackStack = false
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(15.dp))
+            }
+            item {
                 OutlinedTextField(
-                    value = viewModel.status.value,
-                    onValueChange = {},
-                    label = { Text("Status") },
-                    modifier = modifier.fillMaxWidth(),
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowDropDown,
-                                contentDescription = "Select Status"
+                    value = viewModel.description.value,
+                    onValueChange = { viewModel.onDescriptionChanged(it) },
+                    label = { Text("Description") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                // Editable map
+                if (isValidLatLon(coordinates)) {
+                    val parts: List<String> = coordinates.split(",")
+                    // Use either the old or newly updated location from the ViewModel
+                    val lat = parts[0].trim().toDouble()
+                    val long = parts[1].trim().toDouble()
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    ) {
+                        // Pass a callback to update the location in the ViewModel when the user taps the map
+                        MapBox(
+                            latitude = lat,
+                            longitude = long,
+                            interactive = true
+                        ) { newLat, newLong ->
+                            // Whenever the user taps, store these new coords
+                            viewModel.onLocationChanged("$newLat, $newLong")
+                        }
+                    }
+                } else {
+                    Text("Invalid coordinates")
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+            item {
+                // Dropdown for Status
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = viewModel.status.value,
+                        onValueChange = {},
+                        label = { Text("Status") },
+                        modifier = Modifier.fillMaxWidth(),
+                        readOnly = true,
+                        trailingIcon = {
+                            IconButton(onClick = { expanded = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.ArrowDropDown,
+                                    contentDescription = "Select Status"
+                                )
+                            }
+                        }
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        viewModel.statusOptions.forEach { status ->
+                            DropdownMenuItem(
+                                text = { Text(status) },
+                                onClick = {
+                                    viewModel.onStatusChanged(status)
+                                    expanded = false
+                                }
                             )
                         }
                     }
-                )
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false },
-                    modifier = modifier.fillMaxWidth()
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                // Button to select a new photo from the gallery
+                Button(
+                    onClick = { launcher.launch("image/*") },
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    viewModel.statusOptions.forEach { status ->
-                        DropdownMenuItem(
-                            text = { Text(status) },
-                            onClick = {
-                                viewModel.onStatusChanged(status)
-                                expanded = false
-                            }
-                        )
-                    }
+                    Text("Change Photo")
                 }
             }
-            Spacer(modifier = modifier.height(16.dp))
-
-            // Button to select a new photo from the gallery
-            Button(
-                onClick = { launcher.launch("image/*") },
-                modifier = modifier.fillMaxWidth()
-            ) {
-                Text("Change Photo")
-            }
-
-            // Preview the newly selected image
-            if (viewModel.photo.value.isNotEmpty()) {
-                AsyncImage(
-                    model = viewModel.photo.value,
-                    contentDescription = "Selected Photo",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                )
-            }
-            Spacer(modifier = modifier.height(16.dp))
-
-            // Button to confirm the update
-            Button(onClick = {
-                coroutineScope.launch {
-                    // We keep the full content URI in viewModel.photo.
-                    // But for the server, we want to store only the final filename portion:
-                    val fullUri = viewModel.photo.value
-                    // Extract lastPathSegment, minus extension if you prefer:
-                    val cleanedFileName = if (fullUri.isNotEmpty()) {
-                        Uri.parse(fullUri).lastPathSegment ?: ""
-                    } else {
-                        ""
-                    }
-
-                    val responseUpdatedClaim = postUpdateClaim(
-                        context = context,
-                        userId = userId,
-                        indexUpdateClaim = claim.claimId,
-                        updateClaimDescription = viewModel.description.value,
-                        // pass the cleaned filename instead of the entire content://...
-                        updateClaimPhoto = cleanedFileName,
-                        updateClaimLocation = viewModel.location.value,
-                        updateClaimStatus = viewModel.status.value
+            item {
+                // Preview the newly selected image, if any
+                if (viewModel.photo.value.isNotEmpty()) {
+                    AsyncImage(
+                        model = viewModel.photo.value,
+                        contentDescription = "Selected Photo",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
                     )
+                }
+            }
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+            item {
+                // Button to confirm the update
+                Button(onClick = {
+                    coroutineScope.launch {
+                        val fullUri = viewModel.photo.value
+                        val cleanedFileName = if (fullUri.isNotEmpty()) {
+                            Uri.parse(fullUri).lastPathSegment ?: ""
+                        } else {
+                            ""
+                        }
 
-                    // Now upload the actual photo bits to the server, passing the same cleaned name
-                    val responseUpdatePhoto = postMethodUploadPhoto(
-                        context = context,
-                        userId = userId,
-                        claimId = claim.claimId,
-                        fileName = cleanedFileName,
-                        // BUT use the original full URI to read the actual bytes
-                        imageUri = Uri.parse(fullUri)
-                    )
+                        val responseUpdatedClaim = postUpdateClaim(
+                            context = context,
+                            userId = userId,
+                            indexUpdateClaim = claim.claimId,
+                            updateClaimDescription = viewModel.description.value,
+                            updateClaimPhoto = cleanedFileName,
+                            updateClaimLocation = viewModel.location.value,
+                            updateClaimStatus = viewModel.status.value
+                        )
 
-                    if (responseUpdatedClaim != null && responseUpdatePhoto != null) {
-                        // Update the local DataStore
-                        val updatedClaim = ClaimInformation(
+                        val responseUpdatePhoto = postMethodUploadPhoto(
+                            context = context,
+                            userId = userId,
                             claimId = claim.claimId,
-                            claimDes = viewModel.description.value,
-                            claimPhoto = cleanedFileName, // store only the shortened name
-                            claimLocation = viewModel.location.value,
-                            claimStatus = viewModel.status.value
+                            fileName = cleanedFileName,
+                            imageUri = Uri.parse(fullUri)
                         )
 
-                        claimsManager.updateOrInsertClaimAtIndex(
-                            userId,
-                            claim.claimId.toInt(),
-                            updatedClaim,
-                            false
-                        )
+                        if (responseUpdatedClaim != null && responseUpdatePhoto != null) {
+                            val updatedClaim = ClaimInformation(
+                                claimId = claim.claimId,
+                                claimDes = viewModel.description.value,
+                                claimPhoto = cleanedFileName,
+                                claimLocation = viewModel.location.value,
+                                claimStatus = viewModel.status.value
+                            )
 
-                        Toast.makeText(context, "Claim updated successfully", Toast.LENGTH_SHORT)
-                            .show()
+                            claimsManager.updateOrInsertClaimAtIndex(
+                                userId,
+                                claim.claimId.toInt(),
+                                updatedClaim,
+                                false
+                            )
 
-                        navController.navigate("claimsHomeScreen")
-                        viewModel.exitEditMode()
-                    } else {
-                        Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Claim updated successfully", Toast.LENGTH_SHORT)
+                                .show()
+
+                            navController.navigate("claimsHomeScreen")
+                            viewModel.exitEditMode()
+                        } else {
+                            Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT).show()
+                        }
                     }
+                }) {
+                    Text("Update Claim")
                 }
-            }) {
-                Text("Update Claim")
             }
         }
     }
@@ -313,7 +362,6 @@ suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap
 fun DisplayClaimImage(fileName: String, context: Context) {
     val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
 
-    // This effect fetches/decodes the image once, whenever fileName changes
     LaunchedEffect(fileName) {
         val bitmap = generateClaimBitmap(fileName, context)
         imageBitmap.value = bitmap

@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
-class ClaimViewModel : ViewModel() {
+class NewClaimViewModel : ViewModel() {
     // State for the claim description.
     var description = mutableStateOf("")
         private set

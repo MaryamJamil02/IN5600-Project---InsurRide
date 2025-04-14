@@ -1,11 +1,7 @@
 package com.example.in5600_project.presentation.ui.components
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableDoubleStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.example.in5600_project.R
@@ -16,49 +12,62 @@ import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 
 @Composable
-fun MapBox(longitude: Double, latitude: Double) {
-    var clickedLongitude by remember { mutableDoubleStateOf(longitude) }
-    var clickedLatitude by remember { mutableDoubleStateOf(latitude) }
+fun MapBox(
+    latitude: Double,
+    longitude: Double,
+    interactive: Boolean = true,
+    onLocationChanged: (Double, Double) -> Unit = { _, _ -> }
+) {
+    // Store the marker position locally for immediate UI feedback
+    var markerLatitude by remember { mutableDoubleStateOf(latitude) }
+    var markerLongitude by remember { mutableDoubleStateOf(longitude) }
 
-    // Set up the map state
+    // Set up the map state (camera position, zoom, etc.)
     val mapState = rememberMapViewportState {
         setCameraOptions {
             zoom(5.0)
-            center(Point.fromLngLat(clickedLongitude, clickedLatitude))
+            center(Point.fromLngLat(markerLongitude, markerLatitude))
             pitch(0.0)
             bearing(0.0)
         }
     }
 
-    // Create  painter/icon
-    val marker = rememberIconImage(
+    // Icon for the marker
+    val markerIcon = rememberIconImage(
         key = R.drawable.red_marker,
         painter = painterResource(R.drawable.red_marker)
     )
 
-    // Pass mapState to MapboxMap
+    // Provide an onMapClickListener only if interactive == true
+    val onMapClickListener = if (interactive) {
+        { point: Point ->
+            markerLongitude = point.longitude()
+            markerLatitude = point.latitude()
+
+            // Recenter the camera on the newly selected location
+            mapState.setCameraOptions {
+                center(Point.fromLngLat(markerLongitude, markerLatitude))
+            }
+
+            // IMPORTANT: inform the parent that the location changed
+            onLocationChanged(markerLatitude, markerLongitude)
+
+            true
+        }
+    } else {
+        null
+    }
+
     MapboxMap(
         modifier = Modifier.fillMaxSize(),
         mapViewportState = mapState,
-        onMapClickListener = { point ->
-            clickedLongitude = point.longitude()
-            clickedLatitude = point.latitude()
-            println("Point: $point.")
-
-            // Move camera to the new clicked location:
-            mapState.setCameraOptions {
-                center(Point.fromLngLat(clickedLongitude, clickedLatitude))
-            }
-            true
-        }
-
+        onMapClickListener = onMapClickListener
     ) {
-        println("MapBox: $clickedLongitude, $clickedLatitude")
-        PointAnnotation(point = Point.fromLngLat(clickedLongitude, clickedLatitude)) {
-            iconImage = marker
+        // Show the marker at the current (markerLongitude, markerLatitude)
+        PointAnnotation(
+            point = Point.fromLngLat(markerLongitude, markerLatitude)
+        ) {
+            iconImage = markerIcon
         }
-
-
-
     }
 }

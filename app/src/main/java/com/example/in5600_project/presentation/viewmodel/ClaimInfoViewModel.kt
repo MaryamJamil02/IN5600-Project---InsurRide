@@ -12,8 +12,11 @@ import kotlinx.coroutines.launch
 class ClaimInfoViewModel : ViewModel() {
     var description = mutableStateOf("")
         private set
+
+    // This is what we actually send to the server for updated claim coords
     var location = mutableStateOf("")
         private set
+
     var status = mutableStateOf("Pending")
         private set
 
@@ -29,9 +32,8 @@ class ClaimInfoViewModel : ViewModel() {
 
     fun enterEditMode(claim: ClaimInformation) {
         description.value = claim.claimDes
-        location.value = claim.claimLocation
+        location.value = claim.claimLocation  // Use the existing location from the claim
         status.value = claim.claimStatus
-        // We'll fetch the new photo from server if needed; clear existing:
         photo.value = ""
         isEditMode.value = true
     }
@@ -56,10 +58,6 @@ class ClaimInfoViewModel : ViewModel() {
         photo.value = newPhotoUri
     }
 
-    /**
-     *  Download the base64 from server, decode to an actual file in cache, then set photo.value to content://...
-     *  so we can display it easily in Compose.
-     */
     fun fetchPhoto(context: Context, fileName: String) {
         viewModelScope.launch {
             val base64String = getMethodDownloadPhoto(context, fileName)
