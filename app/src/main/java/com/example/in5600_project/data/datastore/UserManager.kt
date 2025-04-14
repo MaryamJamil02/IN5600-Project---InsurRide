@@ -15,10 +15,9 @@ class UserManager(private val context: Context) {
     private fun userIdKey(id: String) = stringPreferencesKey("user_${id}_id")
     private fun emailKey(id: String) = stringPreferencesKey("user_${id}_mail")
     private fun passwordKey(id: String) = stringPreferencesKey("user_${id}_password")
-    private fun isLoggedInKey(id: String) = booleanPreferencesKey("user_${id}_is_logged_in")
 
     // Save user data in DataStore
-    suspend fun saveUserPreferences(id: String, email: String, password: String, isLoggedIn: Boolean) {
+    suspend fun saveUserPreferences(id: String, email: String, password: String) {
 
         context.dataStore.edit { preferences ->
 
@@ -34,7 +33,6 @@ class UserManager(private val context: Context) {
             preferences[userIdKey(id)] = id
             preferences[emailKey(id)] = email
             preferences[passwordKey(id)] = password
-            preferences[isLoggedInKey(id)] = isLoggedIn
         }
     }
 
@@ -46,8 +44,7 @@ class UserManager(private val context: Context) {
                 UserInformation(
                     id = preferences[userIdKey(user)] ?: "",
                     email = preferences[emailKey(user)] ?: "",
-                    password = preferences[passwordKey(user)] ?: "",
-                    isLoggedIn = preferences[isLoggedInKey(user)] ?: false
+                    password = preferences[passwordKey(user)] ?: ""
                 )
             }
         }
@@ -61,16 +58,6 @@ class UserManager(private val context: Context) {
             }
             matchingUser?.let { preferences[emailKey(it)] } ?: ""
         }.first()
-    }
-
-
-
-
-    // Logout a specific user
-    suspend fun logoutUser( id: String) {
-        context.dataStore.edit { preferences ->
-            preferences[isLoggedInKey(id)] = false
-        }
     }
 
     // Change user password
@@ -92,6 +79,5 @@ suspend fun clearDataStore(context: Context) {
 data class UserInformation(
     val id: String,
     val email: String,
-    val password: String,
-    val isLoggedIn: Boolean
+    val password: String
 )

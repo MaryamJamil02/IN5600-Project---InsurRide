@@ -61,19 +61,6 @@ fun LoginScreen(modifier: Modifier, viewModel: LoginViewModel = LoginViewModel()
             LoginButton(modifier, email, password, myProfileViewModel, navController)
 
 
-            // Clear datastore - only use if needed
-            Button(
-                onClick = {
-                    coroutineScope.launch {
-                        clearDataStore(context)
-                    }
-
-                },
-
-                modifier = modifier,
-            ) { Text("Clear DataStore") }
-
-
             Text(email)
             Text(password)
         }

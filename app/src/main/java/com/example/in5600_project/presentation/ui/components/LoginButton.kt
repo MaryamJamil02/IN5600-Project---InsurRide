@@ -42,23 +42,12 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
             // Use a coroutine to call the server-side and local login method
             coroutineScope.launch {
 
-                // Get the current list of the stored users
-                val users = userManager.getUserPreferences().first()
-
-                // Check if a user with the provided email is already logged in
-                if (users.any { it.email == email && it.password == hashedPassword}) {
-                    successfullyLoggedIn = true
-                    currentUserId = users.first { it.email == email }.id
-                    Toast.makeText(context, "Local login successful", Toast.LENGTH_SHORT).show()
-                }
-
-                else {
                     // Continue with the network login call
                     val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
 
                     if (responseLogin != null) {
                         // Save the user's data in DataStore
-                        userManager.saveUserPreferences(responseLogin.id,responseLogin.email, hashedPassword, true)
+                        userManager.saveUserPreferences(responseLogin.id,responseLogin.email, hashedPassword)
                         currentUserId = responseLogin.id
                         successfullyLoggedIn = true
                         Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
@@ -67,7 +56,7 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
                     else {
                         Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
                     }
-                }
+
 
                 if (successfullyLoggedIn) {
                     val claimsNumber = getMethodMyClaimsNumber(context,currentUserId)

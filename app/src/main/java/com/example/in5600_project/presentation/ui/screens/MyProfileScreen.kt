@@ -10,10 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.UserManager
+import com.example.in5600_project.data.datastore.clearDataStore
 import com.example.in5600_project.navigation.AppBottomBar
 import com.example.in5600_project.presentation.ui.components.MapBox
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
@@ -30,6 +32,8 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
     val userManager = UserManager(context)
     // Collect the user id from the StateFlow
     val userId by viewModel.currentUserId.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
 
     Scaffold(
         bottomBar = { AppBottomBar(navController) }
@@ -42,27 +46,8 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
 
             Button(
                 onClick = {
-                    CoroutineScope(Dispatchers.IO).launch {
-                        // Logout the user by setting isLoggedIn to false in DataStore
-                        userManager.logoutUser(userId)
-
-                        // Retrieve the updated user preferences
-                        val users = userManager.getUserPreferences().first()
-                        val currentUser = users.find { it.id == userId }
-
-                        // Check if the user's isLoggedIn flag is now false
-                        if (currentUser == null || !currentUser.isLoggedIn) {
-                            // Switch to the Main thread to show the toast
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "Logout successful for $userId", Toast.LENGTH_SHORT).show()
-                            }
-                        } else {
-                            withContext(Dispatchers.Main) {
-                                Toast.makeText(context, "Logout failed", Toast.LENGTH_SHORT).show()
-                            }
-                        }
-
-                        // Navigate to the login screen after the check
+                    coroutineScope.launch {
+                       clearDataStore(context)
                         withContext(Dispatchers.Main) {
                             navController.navigate("loginScreen")
                         }
