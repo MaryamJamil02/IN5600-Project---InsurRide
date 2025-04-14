@@ -40,7 +40,6 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
     // Create one instance of the ViewModel at this higher level
     val myProfileViewModel: MyProfileViewModel = viewModel()
     val claimViewModel: ClaimViewModel = viewModel()
-    val claimInfoViewModel: ClaimInfoViewModel = viewModel()
     val context = LocalContext.current
     val claimsManager = remember { ClaimsManager(context) }
     val userId by myProfileViewModel.currentUserId.collectAsState()
@@ -90,6 +89,9 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
 
         composable("claimInfoScreen/{claimId}") { backStackEntry ->
             val claimId = backStackEntry.arguments?.getString("claimId") ?: ""
+
+            val claimInfoViewModel: ClaimInfoViewModel = viewModel()
+
             // Find the claim in the list by matching claimId.
             val claim: ClaimInformation = claims.find { it.claimId == claimId }
                 ?: ClaimInformation("", "", "", "", "")

@@ -16,7 +16,9 @@ fun GoBackButton(navController: NavController, onReset: () -> Unit = {}, isPopBa
             navController.popBackStack()
         }
         else {
-            navController.navigate("claimsHomeScreen")
+
+            navController.navigateUp()
+
         }
 
     }) {

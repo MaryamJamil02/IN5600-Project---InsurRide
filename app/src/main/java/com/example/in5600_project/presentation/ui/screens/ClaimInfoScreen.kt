@@ -39,7 +39,7 @@ fun ClaimInfoScreen(
     modifier: Modifier,
     claim: ClaimInformation,
     navController: NavController,
-    viewModel: ClaimInfoViewModel = viewModel(),
+    viewModel: ClaimInfoViewModel,
     context: Context,
     userId: String
 ) {
