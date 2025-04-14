@@ -28,6 +28,8 @@ import com.example.in5600_project.data.network.getMethodDownloadPhoto
 import com.example.in5600_project.data.network.postMethodUploadPhoto
 import com.example.in5600_project.data.network.postUpdateClaim
 import com.example.in5600_project.presentation.ui.components.GoBackButton
+import com.example.in5600_project.presentation.ui.components.MapBox
+import com.example.in5600_project.utils.isValidLatLon
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -45,6 +47,7 @@ fun ClaimInfoScreen(
     val claimsManager = ClaimsManager(context)
 
     var expanded by remember { mutableStateOf(false) }
+    val coordinates = claim.claimLocation
 
     // Launcher to pick an image from the gallery (only used in edit mode).
     val launcher = rememberLauncherForActivityResult(
@@ -94,10 +97,34 @@ fun ClaimInfoScreen(
                 style = MaterialTheme.typography.bodyMedium
             )
             Spacer(modifier = modifier.height(4.dp))
-            Text(
-                text = "Location: ${claim.claimLocation}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+
+            Box(
+                modifier = modifier.padding(16.dp)
+            ){
+                // LATER FIX
+
+                if (isValidLatLon(coordinates)){
+                    val parts : List<String> = coordinates.split(",")
+                    val lat = parts[0].trim { it <= ' ' }.toDouble()
+                    val long = parts[1].trim { it <= ' ' }.toDouble()
+
+                    MapBox(lat,long)
+                }
+
+                else{
+                    Text("Invalid coordinates")
+                }
+
+            }
+
+
+
+
+
+
+
+
+
             Spacer(modifier = modifier.height(16.dp))
 
             // Show the claim image. Typically you'd fetch from server + decode to show it.

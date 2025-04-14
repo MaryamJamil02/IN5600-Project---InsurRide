@@ -10,14 +10,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.UserManager
-import com.example.in5600_project.navigation.*
+import com.example.in5600_project.navigation.AppBottomBar
 import com.example.in5600_project.presentation.ui.components.MapBox
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -41,12 +38,8 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
         Column(modifier = modifier.padding(innerPadding)) {
             Text("Welcome to My Profile")
 
-            Box(
-                modifier = modifier.padding(innerPadding)
-            ){
-                // LATER FIX
-                MapBox(10.718350155423748,59.9437109252857 )
-            }
+
+
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
@@ -89,3 +82,5 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
         }
     }
 }
+
+
