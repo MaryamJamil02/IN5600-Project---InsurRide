@@ -24,7 +24,7 @@ fun MapBox(longitude: Double, latitude: Double) {
     val mapState = rememberMapViewportState {
         setCameraOptions {
             zoom(5.0)
-            center(Point.fromLngLat(longitude, latitude))
+            center(Point.fromLngLat(clickedLongitude, clickedLatitude))
             pitch(0.0)
             bearing(0.0)
         }
@@ -44,6 +44,11 @@ fun MapBox(longitude: Double, latitude: Double) {
             clickedLongitude = point.longitude()
             clickedLatitude = point.latitude()
             println("Point: $point.")
+
+            // Move camera to the new clicked location:
+            mapState.setCameraOptions {
+                center(Point.fromLngLat(clickedLongitude, clickedLatitude))
+            }
             true
         }
 
