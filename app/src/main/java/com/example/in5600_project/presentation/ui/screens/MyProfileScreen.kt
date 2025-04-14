@@ -1,6 +1,7 @@
 package com.example.in5600_project.presentation.ui.screens
 
 import android.widget.Toast
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -17,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.UserManager
 import com.example.in5600_project.navigation.*
+import com.example.in5600_project.presentation.ui.components.MapBox
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,6 +40,13 @@ fun MyProfileScreen(modifier: Modifier = Modifier, navController: NavController,
         // Home screen content goes here
         Column(modifier = modifier.padding(innerPadding)) {
             Text("Welcome to My Profile")
+
+            Box(
+                modifier = modifier.padding(innerPadding)
+            ){
+                // LATER FIX
+                MapBox(10.718350155423748,59.9437109252857 )
+            }
             Button(
                 onClick = {
                     CoroutineScope(Dispatchers.IO).launch {
