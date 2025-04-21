@@ -131,7 +131,7 @@ fun ClaimInfoScreen(
             }
             item {
                 // Show the claim image
-                DisplayClaimImage(claim.claimPhoto, context)
+                DisplayClaimImage(claim.claimPhoto, context, modifier)
             }
             item {
                 Spacer(modifier = Modifier.height(16.dp))
@@ -359,7 +359,7 @@ suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap
  * Displays the claim image by downloading & decoding it into an ImageBitmap.
  */
 @Composable
-fun DisplayClaimImage(fileName: String, context: Context) {
+fun DisplayClaimImage(fileName: String, context: Context, modifier: Modifier) {
     val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
 
     LaunchedEffect(fileName) {

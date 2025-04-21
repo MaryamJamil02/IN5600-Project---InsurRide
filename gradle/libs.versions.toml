@@ -21,6 +21,7 @@ lifecycleRuntimeKtxVersion = "2.2.0"
 
 mapboxAndroidGestures = "0.8.0"
 mapsCompose = "11.11.0"
+materialIconsExtended = "<your‑compose‑version>"
 protobufJavalite = "3.18.0"
 volley = "1.2.1"
 navigationCompose = "2.8.9"
@@ -65,6 +66,7 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 
 mapbox-android-gestures = { module = "com.mapbox.mapboxsdk:mapbox-android-gestures", version.ref = "mapboxAndroidGestures" }
 maps-compose = { module = "com.mapbox.extension:maps-compose", version.ref = "mapsCompose" }
+material-icons-extended = { module = "androidx.compose.material:material-icons-extended", version.ref = "materialIconsExtended" }
 protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobufJavalite" }
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
