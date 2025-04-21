@@ -70,11 +70,14 @@ dependencies {
 
     implementation(libs.gson)
     implementation (libs.coil.compose)
+    implementation(libs.androidx.material.icons.extended)
+
 
     //-------------
     implementation(libs.android.v11110)
     implementation(libs.maps.compose)
     implementation (libs.mapbox.android.gestures)
+    implementation(libs.androidx.animation.core.lint)
 
 }
 
