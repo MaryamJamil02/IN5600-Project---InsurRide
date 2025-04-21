@@ -9,31 +9,37 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.automirrored.filled.Message
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.in5600_project.data.datastore.ClaimInformation
-import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
-import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.network.getMethodDownloadPhoto
 import com.example.in5600_project.data.network.postMethodUploadPhoto
 import com.example.in5600_project.data.network.postUpdateClaim
 import com.example.in5600_project.presentation.ui.components.GoBackButton
 import com.example.in5600_project.presentation.ui.components.MapBox
+import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import com.example.in5600_project.utils.isValidLatLon
 import kotlinx.coroutines.launch
 
 @SuppressLint("CoroutineCreationDuringComposition")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClaimInfoScreen(
     modifier: Modifier,
@@ -45,342 +51,394 @@ fun ClaimInfoScreen(
 ) {
     val coroutineScope = rememberCoroutineScope()
     val claimsManager = ClaimsManager(context)
-
     var expanded by remember { mutableStateOf(false) }
     val coordinates = claim.claimLocation
 
-    // Launcher to pick an image from the gallery (only used in edit mode).
     val launcher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { viewModel.onPhotoChanged(it.toString()) }
     }
 
-    // If not editing, fetch the (existing) photo from server if it’s not empty.
     LaunchedEffect(claim.claimPhoto) {
         if (!viewModel.isEditMode.value && claim.claimPhoto.isNotEmpty()) {
             viewModel.fetchPhoto(context, claim.claimPhoto)
         }
     }
 
-    if (!viewModel.isEditMode.value) {
-        // --------------------------
-        // VIEW MODE (using a LazyColumn)
-        // --------------------------
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            item {
-                Text("Claim Information", modifier = Modifier.padding(16.dp))
-            }
-            item {
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-            item {
-                GoBackButton(navController, isPopBackStack = false)
-            }
-            item {
-                Spacer(modifier = Modifier.height(15.dp))
-            }
-            item {
-                Text(
-                    text = "Claim ID: ${claim.claimId}",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                Text(
-                    text = "Status: ${claim.claimStatus}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-            item {
-                Text(
-                    text = "Description: ${claim.claimDes}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-            item {
-                // Fixed height for the map preview
-
-                if (isValidLatLon(coordinates)) {
-                    val parts: List<String> = coordinates.split(",")
-                    val lat = parts[0].trim().toDouble()
-                    val long = parts[1].trim().toDouble()
-
-                    // Non-interactive map
-                    MapBox(lat, long, false)
-                } else {
-                    MapBox(null, null, false)
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                navigationIcon = {
+                    GoBackButton(navController, isPopBackStack = false)
+                },
+                title = {
+                    Text(
+                        "Claim Information",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
-
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            item {
-                // Show the claim image
-                DisplayClaimImage(claim.claimPhoto, context, modifier)
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            item {
-                Button(
-                    onClick = {
-                        viewModel.enterEditMode(claim)
-                        viewModel.fetchPhoto(context, claim.claimPhoto)
-                    }
-                ) {
-                    Text("Edit Claim")
-                }
-            }
+            )
         }
-    } else {
-        // --------------------------
-        // EDIT MODE (using a LazyColumn)
-        // --------------------------
+    ) { innerPadding ->
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            item {
-                Text("Edit Claim Information", modifier = Modifier.padding(16.dp))
-            }
-            item {
-                Spacer(modifier = Modifier.height(30.dp))
-            }
-            item {
-                GoBackButton(
-                    navController,
-                    onReset = { viewModel.exitEditMode() },
-                    isPopBackStack = false
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(15.dp))
-            }
-            item {
-                OutlinedTextField(
-                    value = viewModel.description.value,
-                    onValueChange = { viewModel.onDescriptionChanged(it) },
-                    label = { Text("Description") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                // Editable map
-                if (isValidLatLon(coordinates)) {
-                    val parts: List<String> = coordinates.split(",")
-                    // Use either the old or newly updated location from the ViewModel
-                    val lat = parts[0].trim().toDouble()
-                    val long = parts[1].trim().toDouble()
+            if (!viewModel.isEditMode.value) {
+                // —— VIEW MODE ——
 
-
-                    // Pass a callback to update the location in the ViewModel when the user taps the map
-                    MapBox(
-                        initialLatitude = lat,
-                        initialLongitude = long,
-                        interactive = true
-                    ) { newLat, newLong ->
-                        // Whenever the user taps, store the new coordinates
-                        viewModel.onLocationChanged("$newLat, $newLong")
-                    }
-
-                } else {
-                    MapBox(null, null, true) { newLat, newLong ->
-                        // Whenever the user taps, store the new coordinates
-                        viewModel.onLocationChanged("$newLat, $newLong")
-                    }
-
-                }
-            }
-            item {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-            item {
-                // Dropdown for Status
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    OutlinedTextField(
-                        value = viewModel.status.value,
-                        onValueChange = {},
-                        label = { Text("Status") },
+                // Details card
+                item {
+                    Card(
                         modifier = Modifier.fillMaxWidth(),
-                        readOnly = true,
-                        trailingIcon = {
-                            IconButton(onClick = { expanded = true }) {
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
-                                    contentDescription = "Select Status"
+                                    imageVector = Icons.Filled.Tag,
+                                    contentDescription = null,
+                                    tint = Color(0xFF6C63FF),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Claim ID: ${claim.claimId}",
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = null,
+                                    tint = Color(0xFF6C63FF),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text("Status:", style = MaterialTheme.typography.bodyLarge)
+                                Spacer(Modifier.width(4.dp))
+                                Surface(
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = Color(0xFFD3F8E2)
+                                ) {
+                                    Text(
+                                        text = claim.claimStatus,
+                                        modifier = Modifier.padding(
+                                            horizontal = 12.dp,
+                                            vertical = 4.dp
+                                        ),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Message,
+                                    contentDescription = null,
+                                    tint = Color(0xFF6C63FF),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Description: ${claim.claimDes}",
+                                    style = MaterialTheme.typography.bodyMedium
                                 )
                             }
                         }
-                    )
-                    DropdownMenu(
-                        expanded = expanded,
-                        onDismissRequest = { expanded = false },
-                        modifier = Modifier.fillMaxWidth()
+                    }
+                }
+
+                // Location card
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        elevation = CardDefaults.cardElevation(4.dp)
                     ) {
-                        viewModel.statusOptions.forEach { status ->
-                            DropdownMenuItem(
-                                text = { Text(status) },
-                                onClick = {
-                                    viewModel.onStatusChanged(status)
-                                    expanded = false
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("Location", style = MaterialTheme.typography.titleMedium)
+                            if (isValidLatLon(coordinates)) {
+                                val parts = coordinates.split(",")
+                                MapBox(
+                                    parts[0].trim().toDouble(),
+                                    parts[1].trim().toDouble(),
+                                    interactive = false
+                                )
+                            } else {
+                                Box(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(100.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "No location data",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
                                 }
+                            }
+                        }
+                    }
+                }
+
+                // Photo card
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("Photo", style = MaterialTheme.typography.titleMedium)
+                            DisplayClaimImage(
+                                claim.claimPhoto,
+                                context,
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(180.dp)
+                                    .clip(RoundedCornerShape(8.dp))
                             )
                         }
                     }
                 }
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            item {
-                // Button to select a new photo from the gallery
-                Button(
-                    onClick = { launcher.launch("image/*") },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text("Change Photo")
-                }
-            }
-            item {
-                // Preview the newly selected image, if any
-                if (viewModel.photo.value.isNotEmpty()) {
-                    AsyncImage(
-                        model = viewModel.photo.value,
-                        contentDescription = "Selected Photo",
+
+                // Edit button
+                item {
+                    Button(
+                        onClick = {
+                            viewModel.enterEditMode(claim)
+                            viewModel.fetchPhoto(context, claim.claimPhoto)
+                        },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .height(48.dp),
+                        shape = RoundedCornerShape(24.dp)
+                    ) {
+                        Text("Edit Claim", fontSize = 16.sp, color = Color.White)
+                    }
+                }
+            } else {
+                // —— EDIT MODE ——
+
+                // 1) Description
+                item {
+                    OutlinedTextField(
+                        value = viewModel.description.value,
+                        onValueChange = { viewModel.onDescriptionChanged(it) },
+                        label = { Text("Description") },
+                        modifier = Modifier.fillMaxWidth()
                     )
                 }
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            item {
-                // Button to confirm the update
-                Button(onClick = {
-                    coroutineScope.launch {
-                        val fullUri = viewModel.photo.value
-                        val cleanedFileName = if (fullUri.isNotEmpty()) {
-                            Uri.parse(fullUri).lastPathSegment ?: ""
-                        } else {
-                            ""
-                        }
 
-                        val responseUpdatedClaim = postUpdateClaim(
-                            context = context,
-                            userId = userId,
-                            indexUpdateClaim = claim.claimId,
-                            updateClaimDescription = viewModel.description.value,
-                            updateClaimPhoto = cleanedFileName,
-                            updateClaimLocation = viewModel.location.value,
-                            updateClaimStatus = viewModel.status.value
+                // 2) Status
+                item {
+                    Box(Modifier.fillMaxWidth()) {
+                        OutlinedTextField(
+                            value = viewModel.status.value,
+                            onValueChange = {},
+                            label = { Text("Status") },
+                            readOnly = true,
+                            trailingIcon = {
+                                IconButton(onClick = { expanded = true }) {
+                                    Icon(Icons.Filled.ArrowDropDown, contentDescription = null)
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth()
                         )
-
-                        val responseUpdatePhoto = postMethodUploadPhoto(
-                            context = context,
-                            userId = userId,
-                            claimId = claim.claimId,
-                            fileName = cleanedFileName,
-                            imageUri = Uri.parse(fullUri)
-                        )
-
-                        if (responseUpdatedClaim != null && responseUpdatePhoto != null) {
-                            val updatedClaim = ClaimInformation(
-                                claimId = claim.claimId,
-                                claimDes = viewModel.description.value,
-                                claimPhoto = cleanedFileName,
-                                claimLocation = viewModel.location.value,
-                                claimStatus = viewModel.status.value
-                            )
-
-                            claimsManager.updateOrInsertClaimAtIndex(
-                                userId,
-                                claim.claimId.toInt(),
-                                updatedClaim,
-                                false
-                            )
-
-                            Toast.makeText(
-                                context,
-                                "Claim updated successfully",
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
-
-                            navController.navigate("claimsHomeScreen")
-                            viewModel.exitEditMode()
-                        } else {
-                            Toast.makeText(context, "Failed to update claim", Toast.LENGTH_SHORT)
-                                .show()
+                        DropdownMenu(
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false },
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            viewModel.statusOptions.forEach { status ->
+                                DropdownMenuItem(
+                                    text = { Text(status) },
+                                    onClick = {
+                                        viewModel.onStatusChanged(status)
+                                        expanded = false
+                                    }
+                                )
+                            }
                         }
                     }
-                }) {
-                    Text("Update Claim")
+                }
+
+                // 3) Location card
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("Location", style = MaterialTheme.typography.titleMedium)
+                            if (isValidLatLon(coordinates)) {
+                                val parts = coordinates.split(",")
+                                MapBox(
+                                    initialLatitude = parts[0].trim().toDouble(),
+                                    initialLongitude = parts[1].trim().toDouble(),
+                                    interactive = true
+                                ) { newLat, newLong ->
+                                    viewModel.onLocationChanged("$newLat, $newLong")
+                                }
+                            } else {
+                                Box(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(100.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        "No location data",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 4) Photo card
+                item {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
+                        elevation = CardDefaults.cardElevation(4.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Text("Photo", style = MaterialTheme.typography.titleMedium)
+
+                            if (viewModel.photo.value.isNotEmpty()) {
+                                AsyncImage(
+                                    model = viewModel.photo.value,
+                                    contentDescription = "Selected Photo",
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(180.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                )
+                            }
+
+                            Button(
+                                onClick = { launcher.launch("image/*") },
+                                modifier.fillMaxWidth()
+                            )
+
+                            {
+                                Text("Change Photo")
+                            }
+                        }
+                    }
+                }
+
+                // 5) Update Claim
+                item {
+                    Button(
+                        onClick = {
+                            coroutineScope.launch {
+                                val fullUri = viewModel.photo.value
+                                val cleanedFileName = fullUri.substringAfterLast('/')
+                                val responseUpdatedClaim = postUpdateClaim(
+                                    context, userId, claim.claimId,
+                                    viewModel.description.value,
+                                    cleanedFileName, viewModel.location.value,
+                                    viewModel.status.value
+                                )
+                                val responseUpdatePhoto = postMethodUploadPhoto(
+                                    context, userId, claim.claimId,
+                                    cleanedFileName, Uri.parse(fullUri)
+                                )
+                                if (responseUpdatedClaim != null && responseUpdatePhoto != null) {
+                                    val updatedClaim = ClaimInformation(
+                                        claimId = claim.claimId,
+                                        claimDes = viewModel.description.value,
+                                        claimPhoto = cleanedFileName,
+                                        claimLocation = viewModel.location.value,
+                                        claimStatus = viewModel.status.value
+                                    )
+                                    claimsManager.updateOrInsertClaimAtIndex(
+                                        userId, claim.claimId.toInt(),
+                                        updatedClaim, false
+                                    )
+                                    Toast.makeText(
+                                        context,
+                                        "Claim updated successfully",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    navController.navigate("claimsHomeScreen")
+                                    viewModel.exitEditMode()
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "Failed to update claim",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text("Update Claim")
+                    }
                 }
             }
         }
     }
 }
 
-/**
- * Helper function to download a base64 image from server, decode it, and return an ImageBitmap.
- */
 suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap? {
-    val base64String = getMethodDownloadPhoto(context, fileName)
-    if (base64String != null) {
-        val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
-        val bitmap = android.graphics.BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-        return bitmap?.asImageBitmap()
-    }
-    return null
+    val base64String = getMethodDownloadPhoto(context, fileName) ?: return null
+    val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
+    return android.graphics.BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+        ?.asImageBitmap()
 }
 
-/**
- * Displays the claim image by downloading & decoding it into an ImageBitmap.
- */
 @Composable
 fun DisplayClaimImage(fileName: String, context: Context, modifier: Modifier) {
-    val imageBitmap = remember { mutableStateOf<ImageBitmap?>(null) }
-
+    var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(fileName) {
-        val bitmap = generateClaimBitmap(fileName, context)
-        imageBitmap.value = bitmap
+        bitmap = generateClaimBitmap(fileName, context)
     }
-
-    if (imageBitmap.value != null) {
-        Image(
-            bitmap = imageBitmap.value!!,
-            contentDescription = "Claim Photo",
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
+    if (bitmap != null) {
+        Image(bitmap = bitmap!!, contentDescription = "Claim Photo", modifier = modifier)
     } else {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        ) {
+        Box(modifier = modifier, contentAlignment = Alignment.Center) {
             Text("Loading image...")
         }
     }
