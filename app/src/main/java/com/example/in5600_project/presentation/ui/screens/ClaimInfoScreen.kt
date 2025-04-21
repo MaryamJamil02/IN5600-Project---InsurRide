@@ -37,6 +37,8 @@ import com.example.in5600_project.presentation.ui.components.MapBox
 import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import com.example.in5600_project.utils.isValidLatLon
 import kotlinx.coroutines.launch
+import com.example.in5600_project.presentation.ui.components.StatusBadge
+
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -110,50 +112,41 @@ fun ClaimInfoScreen(
                                 Icon(
                                     imageVector = Icons.Filled.Tag,
                                     contentDescription = null,
-                                    tint = Color(0xFF6C63FF),
+                                    tint = Color(0xFF213555),
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     "Claim ID: ${claim.claimId}",
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.Filled.Info,
                                     contentDescription = null,
-                                    tint = Color(0xFF6C63FF),
+                                    tint = Color(0xFF213555),
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(Modifier.width(8.dp))
-                                Text("Status:", style = MaterialTheme.typography.bodyLarge)
+                                Text("Status:", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                                 Spacer(Modifier.width(4.dp))
-                                Surface(
-                                    shape = RoundedCornerShape(16.dp),
-                                    color = Color(0xFFD3F8E2)
-                                ) {
-                                    Text(
-                                        text = claim.claimStatus,
-                                        modifier = Modifier.padding(
-                                            horizontal = 12.dp,
-                                            vertical = 4.dp
-                                        ),
-                                        style = MaterialTheme.typography.bodyMedium
-                                    )
-                                }
+                                Spacer(Modifier.width(4.dp))
+                                StatusBadge(status = claim.claimStatus)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Message,
                                     contentDescription = null,
-                                    tint = Color(0xFF6C63FF),
+                                    tint = Color(0xFF213555),
                                     modifier = Modifier.size(24.dp)
                                 )
                                 Spacer(Modifier.width(8.dp))
                                 Text(
                                     "Description: ${claim.claimDes}",
-                                    style = MaterialTheme.typography.bodyMedium
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold
                                 )
                             }
                         }
