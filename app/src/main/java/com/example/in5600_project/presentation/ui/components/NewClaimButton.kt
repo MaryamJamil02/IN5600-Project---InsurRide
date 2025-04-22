@@ -6,6 +6,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
@@ -25,7 +26,8 @@ fun NewClaimButton(
     newClaimStatus: String,
     imageUri : Uri,
     navController: NavController,
-    viewModel: NewClaimViewModel
+    viewModel: NewClaimViewModel,
+    modifier: Modifier
 
 ) {
     val context = LocalContext.current
@@ -91,7 +93,8 @@ fun NewClaimButton(
                 }
             }
         }
-    }) {
+    },
+        modifier = modifier) {
         Text("Add New Claim")
     }
 }

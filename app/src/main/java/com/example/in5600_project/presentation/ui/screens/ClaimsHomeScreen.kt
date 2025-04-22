@@ -1,7 +1,10 @@
 package com.example.in5600_project.presentation.ui.screens
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
@@ -46,14 +49,23 @@ fun ClaimsHomeScreen(
                     .padding(bottom = 16.dp)
             )
 
-            Button(
+
+
+            IconButton(
                 onClick = { navController.navigate("newClaimScreen") },
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp)
+                    .padding(end = 10.dp)
+                    .size(48.dp)
+                    .align(Alignment.End)
             ) {
-                Text("Add New Claim")
+                Icon(
+                    imageVector = Icons.Filled.AddCircle,
+                    contentDescription = "Add New Claim",
+                    tint = Color(0xFF213555),
+                    modifier = Modifier.size(60.dp)
+                )
             }
+
 
             ClaimsListScreen(
                 claims = claims,
