@@ -8,9 +8,11 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.*
@@ -38,7 +40,6 @@ import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import com.example.in5600_project.utils.isValidLatLon
 import kotlinx.coroutines.launch
 import com.example.in5600_project.presentation.ui.components.StatusBadge
-
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -71,9 +72,7 @@ fun ClaimInfoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                navigationIcon = {
-                    GoBackButton(navController, isPopBackStack = false)
-                },
+                navigationIcon = { GoBackButton(navController, isPopBackStack = false) },
                 title = {
                     Text(
                         "Claim Information",
@@ -94,60 +93,94 @@ fun ClaimInfoScreen(
             if (!viewModel.isEditMode.value) {
                 // —— VIEW MODE ——
 
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        IconButton(
+                            onClick = {
+                                viewModel.enterEditMode(claim)
+                                viewModel.fetchPhoto(context, claim.claimPhoto)
+                            },
+                            Modifier.background(color = Color(0xFFE3F2FD), RoundedCornerShape(50))
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Edit,
+                                contentDescription = "Edit Claim",
+                                tint = Color(0xFF213555)
+                            )
+                        }
+                    }
+                }
+
                 // Details card
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
-                        Column(
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                                .padding(16.dp)
                         ) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.Tag,
-                                    contentDescription = null,
-                                    tint = Color(0xFF213555),
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    "Claim ID: ${claim.claimId}",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.Filled.Info,
-                                    contentDescription = null,
-                                    tint = Color(0xFF213555),
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text("Status:", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-                                Spacer(Modifier.width(4.dp))
-                                Spacer(Modifier.width(4.dp))
-                                StatusBadge(status = claim.claimStatus)
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.Message,
-                                    contentDescription = null,
-                                    tint = Color(0xFF213555),
-                                    modifier = Modifier.size(24.dp)
-                                )
-                                Spacer(Modifier.width(8.dp))
-                                Text(
-                                    "Description: ${claim.claimDes}",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Bold
-                                )
+
+
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Tag,
+                                        contentDescription = null,
+                                        tint = Color(0xFF213555),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "Claim ID: ${claim.claimId}",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Info,
+                                        contentDescription = null,
+                                        tint = Color(0xFF213555),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "Status:",
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Spacer(Modifier.width(4.dp))
+                                    StatusBadge(status = claim.claimStatus)
+                                }
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.AutoMirrored.Filled.Message,
+                                        contentDescription = null,
+                                        tint = Color(0xFF213555),
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                    Spacer(Modifier.width(8.dp))
+                                    Text(
+                                        "Description: ${claim.claimDes}",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                }
                             }
                         }
                     }
@@ -156,7 +189,9 @@ fun ClaimInfoScreen(
                 // Location card
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                         elevation = CardDefaults.cardElevation(4.dp)
@@ -195,7 +230,9 @@ fun ClaimInfoScreen(
                 // Photo card
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                         elevation = CardDefaults.cardElevation(4.dp)
@@ -219,37 +256,28 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // Edit button
-                item {
-                    Button(
-                        onClick = {
-                            viewModel.enterEditMode(claim)
-                            viewModel.fetchPhoto(context, claim.claimPhoto)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
-                        shape = RoundedCornerShape(24.dp)
-                    ) {
-                        Text("Edit Claim", fontSize = 16.sp, color = Color.White)
-                    }
-                }
             } else {
                 // —— EDIT MODE ——
 
-                // 1) Description
+                // Description
                 item {
                     OutlinedTextField(
                         value = viewModel.description.value,
                         onValueChange = { viewModel.onDescriptionChanged(it) },
                         label = { Text("Description") },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
                     )
                 }
 
-                // 2) Status
+                // Status
                 item {
-                    Box(Modifier.fillMaxWidth()) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                    ) {
                         OutlinedTextField(
                             value = viewModel.status.value,
                             onValueChange = {},
@@ -280,10 +308,12 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // 3) Location card
+                // Location card
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                         elevation = CardDefaults.cardElevation(4.dp)
@@ -321,10 +351,12 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // 4) Photo card
+                // Photo card
                 item {
                     Card(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                         elevation = CardDefaults.cardElevation(4.dp)
@@ -337,28 +369,46 @@ fun ClaimInfoScreen(
                         ) {
                             Text("Photo", style = MaterialTheme.typography.titleMedium)
 
-                            if (viewModel.photo.value.isNotEmpty()) {
-                                AsyncImage(
-                                    model = viewModel.photo.value,
-                                    contentDescription = "Selected Photo",
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                            ) {
+                                // Floating Edit button to change photo
+                                IconButton(
+                                    onClick = { launcher.launch("image/*") },
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(180.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                )
-                            }
+                                        .size(40.dp)
+                                        .align(Alignment.TopEnd)
+                                        .offset(y = (-20).dp)
+                                        .background(Color(0xFFF7FCFD), CircleShape)
+                                        .padding(4.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Filled.Edit,
+                                        contentDescription = "Change photo",
+                                        modifier = Modifier.size(24.dp),
+                                        tint = Color(0xFF213555)
+                                    )
+                                }
 
-                            Button(
-                                onClick = { launcher.launch("image/*") },
-                                modifier.fillMaxWidth()
-                            )
-
-                            {
-                                Text("Change Photo")
+                                // The photo
+                                if (viewModel.photo.value.isNotEmpty()) {
+                                    AsyncImage(
+                                        model = viewModel.photo.value,
+                                        contentDescription = "Selected Photo",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(180.dp)
+                                            .align(Alignment.BottomCenter)
+                                            .clip(RoundedCornerShape(8.dp))
+                                    )
+                                }
                             }
                         }
                     }
                 }
+
 
                 // 5) Update Claim
                 item {
@@ -405,7 +455,9 @@ fun ClaimInfoScreen(
                                 }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
                     ) {
                         Text("Update Claim")
                     }

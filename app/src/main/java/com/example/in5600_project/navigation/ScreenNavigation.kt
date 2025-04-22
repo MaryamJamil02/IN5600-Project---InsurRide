@@ -18,9 +18,11 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -32,6 +34,7 @@ import com.example.in5600_project.presentation.ui.screens.NewClaimScreen
 import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import com.example.in5600_project.presentation.viewmodel.NewClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
+
 
 
 @Composable
@@ -110,52 +113,59 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
 
 @Composable
 fun AppBottomBar(navController: NavController) {
-    // Observe the current back stack entry so we know which screen is active
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val colorSelected = Color(0xFF213555)
+    val colorIndicator = Color(0x95748DB4)
 
     NavigationBar {
         // HOME
         NavigationBarItem(
             icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             label = { Text("Home") },
-            selected = (currentRoute == "claimsHomeScreen"),
+            selected = currentRoute == "claimsHomeScreen",
             onClick = {
-                // Use navigation options so that we don’t multiply the same screen
-                // in the back stack
                 navController.navigate(
                     route = "claimsHomeScreen",
                     navOptions = navOptions {
-                        // Pop up to the start of the graph to avoid building a large back stack
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
-                        // Avoid multiple copies of the same screen on top of each other
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
-                        // Restore any state (like scroll position) if we go back to this tab
                         restoreState = true
                     }
                 )
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor     = colorSelected,
+                selectedTextColor     = colorSelected,
+                unselectedIconColor   = Color.Gray,
+                unselectedTextColor   = Color.Gray,
+                indicatorColor        = colorIndicator
+            )
         )
 
         // MY PROFILE
         NavigationBarItem(
             icon = { Icon(Icons.Default.Person, contentDescription = "My Profile") },
             label = { Text("My Profile") },
-            selected = (currentRoute == "myProfileScreen"),
+            selected = currentRoute == "myProfileScreen",
             onClick = {
                 navController.navigate(
                     route = "myProfileScreen",
                     navOptions = navOptions {
-                        popUpTo(navController.graph.startDestinationId) {
-                            saveState = true
-                        }
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
                         restoreState = true
                     }
                 )
-            }
+            },
+            colors = NavigationBarItemDefaults.colors(
+                selectedIconColor     = colorSelected,
+                selectedTextColor     = colorSelected,
+                unselectedIconColor   = Color.Gray,
+                unselectedTextColor   = Color.Gray,
+                indicatorColor        = colorIndicator
+            )
         )
     }
 }
