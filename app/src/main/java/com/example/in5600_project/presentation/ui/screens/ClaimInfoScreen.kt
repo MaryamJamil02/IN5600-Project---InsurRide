@@ -10,9 +10,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.*
@@ -36,10 +36,10 @@ import com.example.in5600_project.data.network.postMethodUploadPhoto
 import com.example.in5600_project.data.network.postUpdateClaim
 import com.example.in5600_project.presentation.ui.components.GoBackButton
 import com.example.in5600_project.presentation.ui.components.MapBox
+import com.example.in5600_project.presentation.ui.components.StatusBadge
 import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import com.example.in5600_project.utils.isValidLatLon
 import kotlinx.coroutines.launch
-import com.example.in5600_project.presentation.ui.components.StatusBadge
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -95,8 +95,7 @@ fun ClaimInfoScreen(
 
                 item {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.End
                     ) {
                         IconButton(
@@ -104,7 +103,7 @@ fun ClaimInfoScreen(
                                 viewModel.enterEditMode(claim)
                                 viewModel.fetchPhoto(context, claim.claimPhoto)
                             },
-                            Modifier.background(color = Color(0xFFE3F2FD), RoundedCornerShape(50))
+                            Modifier.background(color = Color(0xFFE3F2FD), shape = RoundedCornerShape(50))
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
@@ -125,62 +124,55 @@ fun ClaimInfoScreen(
                         colors = CardDefaults.cardColors(containerColor = Color(0xFFE3F2FD)),
                         elevation = CardDefaults.cardElevation(4.dp)
                     ) {
-                        Box(
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-
-
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
-                                verticalArrangement = Arrangement.spacedBy(12.dp)
-                            ) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Tag,
-                                        contentDescription = null,
-                                        tint = Color(0xFF213555),
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        "Claim ID: ${claim.claimId}",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.Filled.Info,
-                                        contentDescription = null,
-                                        tint = Color(0xFF213555),
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        "Status:",
-                                        style = MaterialTheme.typography.bodyLarge,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Spacer(Modifier.width(4.dp))
-                                    StatusBadge(status = claim.claimStatus)
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically) {
-                                    Icon(
-                                        imageVector = Icons.AutoMirrored.Filled.Message,
-                                        contentDescription = null,
-                                        tint = Color(0xFF213555),
-                                        modifier = Modifier.size(24.dp)
-                                    )
-                                    Spacer(Modifier.width(8.dp))
-                                    Text(
-                                        "Description: ${claim.claimDes}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Filled.Tag,
+                                    contentDescription = null,
+                                    tint = Color(0xFF213555),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Claim ID: ${claim.claimId}",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Filled.Info,
+                                    contentDescription = null,
+                                    tint = Color(0xFF213555),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Status:",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                StatusBadge(status = claim.claimStatus)
+                            }
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Filled.Message,
+                                    contentDescription = null,
+                                    tint = Color(0xFF213555),
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    "Description: ${claim.claimDes}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.Bold
+                                )
                             }
                         }
                     }
@@ -211,17 +203,12 @@ fun ClaimInfoScreen(
                                     interactive = false
                                 )
                             } else {
-                                Box(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(100.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "No location data",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
-                                }
+                                // Show an empty MapBox even when coordinates are invalid
+                                MapBox(
+                                    initialLatitude = null,
+                                    initialLongitude = null,
+                                    interactive = false
+                                )
                             }
                         }
                     }
@@ -335,16 +322,13 @@ fun ClaimInfoScreen(
                                     viewModel.onLocationChanged("$newLat, $newLong")
                                 }
                             } else {
-                                Box(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .height(100.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        "No location data",
-                                        style = MaterialTheme.typography.bodySmall
-                                    )
+                                // Show an empty MapBox even when coordinates are invalid
+                                MapBox(
+                                    initialLatitude = null,
+                                    initialLongitude = null,
+                                    interactive = true
+                                ) { newLat, newLong ->
+                                    viewModel.onLocationChanged("$newLat, $newLong")
                                 }
                             }
                         }
@@ -409,8 +393,7 @@ fun ClaimInfoScreen(
                     }
                 }
 
-
-                // 5) Update Claim
+                // Update Claim Button
                 item {
                     Button(
                         onClick = {
