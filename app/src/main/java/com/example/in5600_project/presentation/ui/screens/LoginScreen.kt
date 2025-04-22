@@ -29,7 +29,7 @@ import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 @Composable
 fun LoginScreen(
     modifier: Modifier,
-    viewModel: LoginViewModel = LoginViewModel(),
+    viewModel: LoginViewModel,
     myProfileViewModel: MyProfileViewModel,
     navController: NavController
 ) {

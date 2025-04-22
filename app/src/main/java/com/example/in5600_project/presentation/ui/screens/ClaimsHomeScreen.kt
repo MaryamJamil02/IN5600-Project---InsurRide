@@ -3,11 +3,14 @@ package com.example.in5600_project.presentation.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +21,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.navigation.AppBottomBar
+import com.example.in5600_project.presentation.ui.theme.PrimaryDark
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClaimsHomeScreen(
     modifier: Modifier = Modifier,
@@ -26,7 +31,23 @@ fun ClaimsHomeScreen(
     claims: List<ClaimInformation>
 ) {
     Scaffold(
-        bottomBar = { AppBottomBar(navController) }
+        bottomBar = { AppBottomBar(navController) },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = "My Claims",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontWeight = FontWeight.Bold
+                        )
+                    )
+                },
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = PrimaryDark,
+                    titleContentColor = Color.White
+                )
+            )
+        }
     ) { innerPadding ->
 
         Column(
@@ -37,19 +58,6 @@ fun ClaimsHomeScreen(
             verticalArrangement = Arrangement.spacedBy(24.dp),
             horizontalAlignment = Alignment.CenterHorizontally  // center children
         ) {
-            Text(
-                text = "My Claims",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF333333),
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
-                    .padding(bottom = 16.dp)
-            )
-
-
 
             IconButton(
                 onClick = { navController.navigate("newClaimScreen") },

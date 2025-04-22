@@ -21,4 +21,9 @@ class LoginViewModel : ViewModel() {
     fun onPasswordChanged(newPassword: String) {
         _password.value = newPassword
     }
+
+    fun clearFields() {
+        _email.value = ""
+        _password.value = ""
+    }
 }

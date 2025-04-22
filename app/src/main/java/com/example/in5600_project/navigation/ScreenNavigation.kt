@@ -32,6 +32,7 @@ import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.presentation.ui.screens.ClaimInfoScreen
 import com.example.in5600_project.presentation.ui.screens.NewClaimScreen
 import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
+import com.example.in5600_project.presentation.viewmodel.LoginViewModel
 import com.example.in5600_project.presentation.viewmodel.NewClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
@@ -43,6 +44,8 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
 
     // Create one instance of the ViewModel at this higher level
     val myProfileViewModel: MyProfileViewModel = viewModel()
+    //LATERFIX : LOGIN VIEWMODEL - may have to delete this one - double
+    val loginViewModel: LoginViewModel = viewModel()
     val claimViewModel: NewClaimViewModel = viewModel()
     val context = LocalContext.current
     val claimsManager = remember { ClaimsManager(context) }
@@ -56,7 +59,8 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
             LoginScreen(
                 modifier = modifier,
                 navController = navController,
-                myProfileViewModel = myProfileViewModel
+                myProfileViewModel = myProfileViewModel,
+                viewModel = loginViewModel
             )
         }
         composable("claimsHomeScreen") {
@@ -68,9 +72,9 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
         }
         composable("myProfileScreen") {
             MyProfileScreen(
-                modifier = modifier,
                 navController = navController,
-                viewModel = myProfileViewModel
+                viewModel = myProfileViewModel,
+                loginViewModel = loginViewModel
             )
         }
 
