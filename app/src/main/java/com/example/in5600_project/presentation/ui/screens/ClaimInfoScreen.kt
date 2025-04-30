@@ -2,6 +2,7 @@ package com.example.in5600_project.presentation.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Base64
 import android.widget.Toast
@@ -21,7 +22,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +40,10 @@ import com.example.in5600_project.presentation.ui.components.StatusBadge
 import com.example.in5600_project.presentation.viewmodel.ClaimInfoViewModel
 import com.example.in5600_project.utils.isValidLatLon
 import kotlinx.coroutines.launch
+import android.graphics.BitmapFactory
+import androidx.compose.ui.graphics.Color
+import java.io.File
+import java.io.FileOutputStream
 
 @SuppressLint("CoroutineCreationDuringComposition")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,7 +76,7 @@ fun ClaimInfoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                navigationIcon = { GoBackButton(navController, isPopBackStack = false) },
+                navigationIcon = { GoBackButton(navController) },
                 title = {
                     Text(
                         "Claim Information",
@@ -114,7 +118,6 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // Details card
                 item {
                     Card(
                         modifier = Modifier
@@ -178,7 +181,6 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // Location card
                 item {
                     Card(
                         modifier = Modifier
@@ -203,7 +205,6 @@ fun ClaimInfoScreen(
                                     interactive = false
                                 )
                             } else {
-                                // Show an empty MapBox even when coordinates are invalid
                                 MapBox(
                                     initialLatitude = null,
                                     initialLongitude = null,
@@ -214,7 +215,6 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // Photo card
                 item {
                     Card(
                         modifier = Modifier
@@ -232,9 +232,9 @@ fun ClaimInfoScreen(
                         ) {
                             Text("Photo", style = MaterialTheme.typography.titleMedium)
                             DisplayClaimImage(
-                                claim.claimPhoto,
-                                context,
-                                Modifier
+                                fileName = claim.claimPhoto,
+                                context = context,
+                                modifier = Modifier
                                     .fillMaxWidth()
                                     .height(180.dp)
                                     .clip(RoundedCornerShape(8.dp))
@@ -246,7 +246,6 @@ fun ClaimInfoScreen(
             } else {
                 // —— EDIT MODE ——
 
-                // Description
                 item {
                     OutlinedTextField(
                         value = viewModel.description.value,
@@ -258,7 +257,6 @@ fun ClaimInfoScreen(
                     )
                 }
 
-                // Status
                 item {
                     Box(
                         Modifier
@@ -295,7 +293,6 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // Location card
                 item {
                     Card(
                         modifier = Modifier
@@ -322,7 +319,6 @@ fun ClaimInfoScreen(
                                     viewModel.onLocationChanged("$newLat, $newLong")
                                 }
                             } else {
-                                // Show an empty MapBox even when coordinates are invalid
                                 MapBox(
                                     initialLatitude = null,
                                     initialLongitude = null,
@@ -335,7 +331,6 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // Photo card
                 item {
                     Card(
                         modifier = Modifier
@@ -358,7 +353,6 @@ fun ClaimInfoScreen(
                                     .fillMaxWidth()
                                     .height(200.dp)
                             ) {
-                                // Floating Edit button to change photo
                                 IconButton(
                                     onClick = { launcher.launch("image/*") },
                                     modifier = Modifier
@@ -376,7 +370,6 @@ fun ClaimInfoScreen(
                                     )
                                 }
 
-                                // The photo
                                 if (viewModel.photo.value.isNotEmpty()) {
                                     AsyncImage(
                                         model = viewModel.photo.value,
@@ -393,7 +386,6 @@ fun ClaimInfoScreen(
                     }
                 }
 
-                // Update Claim Button
                 item {
                     Button(
                         onClick = {
@@ -427,7 +419,7 @@ fun ClaimInfoScreen(
                                         "Claim updated successfully",
                                         Toast.LENGTH_SHORT
                                     ).show()
-                                    navController.navigate("claimsHomeScreen")
+                                    navController.popBackStack()
                                     viewModel.exitEditMode()
                                 } else {
                                     Toast.makeText(
@@ -450,10 +442,25 @@ fun ClaimInfoScreen(
     }
 }
 
+// Try cache first; otherwise download, cache, and decode
 suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap? {
+    val cacheFile = File(context.filesDir, fileName)
+    if (cacheFile.exists()) {
+        return BitmapFactory.decodeFile(cacheFile.absolutePath)
+            ?.asImageBitmap()
+    }
     val base64String = getMethodDownloadPhoto(context, fileName) ?: return null
     val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
-    return android.graphics.BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
+    BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)?.let { bmp ->
+        try {
+            FileOutputStream(cacheFile).use { out ->
+                bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
         ?.asImageBitmap()
 }
 

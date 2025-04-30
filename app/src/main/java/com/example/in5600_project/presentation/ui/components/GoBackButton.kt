@@ -8,18 +8,11 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavController
 
 @Composable
-fun GoBackButton(navController: NavController, onReset: () -> Unit = {}, isPopBackStack : Boolean) {
+fun GoBackButton(navController: NavController, onReset: () -> Unit = {}) {
     IconButton(onClick = {
         onReset()
+        navController.popBackStack()
 
-        if (isPopBackStack) {
-            navController.popBackStack()
-        }
-        else {
-
-            navController.navigateUp()
-
-        }
 
     }) {
         Icon(

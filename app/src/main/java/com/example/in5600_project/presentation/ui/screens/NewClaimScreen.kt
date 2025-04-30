@@ -80,8 +80,7 @@ fun NewClaimScreen(
                 navigationIcon = {
                     GoBackButton(
                         navController,
-                        onReset = { claimViewModel.reset() },
-                        isPopBackStack = false
+                        onReset = { claimViewModel.reset() }
                     )
                 },
                 title = {

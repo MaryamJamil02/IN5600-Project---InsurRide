@@ -1,5 +1,8 @@
+// LoginButton.kt
 package com.example.in5600_project.presentation.ui.components
 
+import android.graphics.BitmapFactory
+import android.util.Base64
 import android.widget.Toast
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -7,11 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.in5600_project.data.datastore.UserManager
-import com.example.in5600_project.utils.hashPassword
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimsManager
 import com.example.in5600_project.data.network.getMethodMyClaimsDesc
 import com.example.in5600_project.data.network.getMethodMyClaimsIds
@@ -19,11 +17,24 @@ import com.example.in5600_project.data.network.getMethodMyClaimsLocation
 import com.example.in5600_project.data.network.getMethodMyClaimsNumber
 import com.example.in5600_project.data.network.getMethodMyClaimsPhoto
 import com.example.in5600_project.data.network.getMethodMyClaimsStatus
+import com.example.in5600_project.data.network.getMethodDownloadPhoto
+import com.example.in5600_project.utils.hashPassword
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.NavController
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 import methodPostRemoteLogin
+import java.io.File
+import java.io.FileOutputStream
 
 @Composable
-fun LoginButton(modifier: Modifier, email: String, password: String, myProfileViewModel: MyProfileViewModel, navController: NavController) {
+fun LoginButton(
+    modifier: Modifier,
+    email: String,
+    password: String,
+    myProfileViewModel: MyProfileViewModel,
+    navController: NavController
+) {
     val context = LocalContext.current
     val userManager = UserManager(context)
     val claimsManager = ClaimsManager(context)
@@ -31,50 +42,71 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
     var successfullyLoggedIn = false
     var currentUserId = ""
 
-    Button( modifier = modifier,
+    Button(
+        modifier = modifier,
         onClick = {
-
             // Hash the password before sending it to the server
             val hashedPassword: String = hashPassword(password)
 
-            println("Hashed Password: $hashedPassword")
-
-            // Use a coroutine to call the server-side and local login method
             coroutineScope.launch {
+                // Remote login
+                val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
 
-                    // Continue with the network login call
-                    val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
-
-                    if (responseLogin != null) {
-                        // Save the user's data in DataStore
-                        userManager.saveUserPreferences(responseLogin.id,responseLogin.email, hashedPassword)
-                        currentUserId = responseLogin.id
-                        successfullyLoggedIn = true
-                        Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-                    }
-
-                    else {
-                        Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
-                    }
-
+                if (responseLogin != null) {
+                    userManager.saveUserPreferences(
+                        responseLogin.id,
+                        responseLogin.email,
+                        hashedPassword
+                    )
+                    currentUserId = responseLogin.id
+                    successfullyLoggedIn = true
+                    Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+                }
 
                 if (successfullyLoggedIn) {
-                    val claimsNumber = getMethodMyClaimsNumber(context,currentUserId)
-                    val claimsIds = getMethodMyClaimsIds(context,currentUserId)
-                    val claimsList = getMethodMyClaimsDesc(context,currentUserId)
-                    val claimsPhoto = getMethodMyClaimsPhoto(context,currentUserId)
-                    val claimsLocation = getMethodMyClaimsLocation(context,currentUserId)
-                    val claimsStatus = getMethodMyClaimsStatus(context,currentUserId)
+                    // Fetch claims metadata
+                    val claimsNumber   = getMethodMyClaimsNumber(context, currentUserId)
+                    val claimsIds      = getMethodMyClaimsIds(context, currentUserId)
+                    val claimsList     = getMethodMyClaimsDesc(context, currentUserId)
+                    val claimsPhoto    = getMethodMyClaimsPhoto(context, currentUserId)
+                    val claimsLocation = getMethodMyClaimsLocation(context, currentUserId)
+                    val claimsStatus   = getMethodMyClaimsStatus(context, currentUserId)
 
-                    // Store the fetched claims in DataStore for offline use.
-                    if (claimsNumber != null && claimsList != null && claimsPhoto != null && claimsLocation != null && claimsStatus != null && claimsIds != null)
-                    {
-                        claimsManager.saveUserClaims(currentUserId, claimsNumber, claimsIds, claimsList, claimsPhoto, claimsLocation, claimsStatus)
+                    if (claimsNumber != null
+                        && claimsIds != null
+                        && claimsList != null
+                        && claimsPhoto != null
+                        && claimsLocation != null
+                        && claimsStatus != null
+                    ) {
+                        // --- NEW: cache each photo locally under filesDir/<fileName>
+                        claimsPhoto.forEach { fileName ->
+                            val base64String = getMethodDownloadPhoto(context, fileName)
+                            if (base64String != null) {
+                                val imageBytes = Base64.decode(
+                                    base64String,
+                                    Base64.NO_WRAP or Base64.URL_SAFE
+                                )
+                                val cacheFile = File(context.filesDir, fileName)
+                                FileOutputStream(cacheFile).use { it.write(imageBytes) }
+                            }
+                        }
+
+                        // Save claims (with file names) in DataStore
+                        claimsManager.saveUserClaims(
+                            currentUserId,
+                            claimsNumber,
+                            claimsIds,
+                            claimsList,
+                            claimsPhoto,
+                            claimsLocation,
+                            claimsStatus
+                        )
                     }
                     // Set the current user's email for logout
                     myProfileViewModel.onUserIdChanged(currentUserId)
-
-                    // Navigate to the next screen or perform other actions
                     navController.navigate("claimsHomeScreen")
                 }
             }
@@ -83,5 +115,3 @@ fun LoginButton(modifier: Modifier, email: String, password: String, myProfileVi
         Text("Login")
     }
 }
-
-

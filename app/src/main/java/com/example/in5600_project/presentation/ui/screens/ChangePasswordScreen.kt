@@ -39,7 +39,7 @@ fun ChangePasswordScreen(
         topBar = {
             TopAppBar(
                 navigationIcon = {
-                    GoBackButton(navController, isPopBackStack = false)
+                    GoBackButton(navController)
                 },
                 title = {
                     Text(
