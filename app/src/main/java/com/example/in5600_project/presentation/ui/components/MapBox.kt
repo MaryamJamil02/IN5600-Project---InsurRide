@@ -15,15 +15,9 @@ import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportS
 import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 
-/**
- * MapBox composable that can optionally start with no pin (if the initial
- * latitude/longitude are null), and will add a pin on first tap.
- *
- * @param initialLatitude (nullable) starting latitude for the pin, or null to show no pin initially
- * @param initialLongitude (nullable) starting longitude for the pin
- * @param interactive If true, tapping the map moves/adds the pin
- * @param onLocationChanged Callback invoked whenever the user taps the map; provides lat/long
- */
+
+
+
 @Composable
 fun MapBox(
     initialLatitude: Double?,

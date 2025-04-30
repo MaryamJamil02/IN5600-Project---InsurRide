@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.in5600_project.R
 import com.example.in5600_project.data.datastore.clearDataStore
 import com.example.in5600_project.navigation.AppBottomBar
 import com.example.in5600_project.presentation.ui.theme.SecondaryDark
@@ -76,17 +77,12 @@ fun MyProfileScreen(
             // Profile Avatar
             Box(
                 modifier = Modifier
-                    .size(120.dp)
+                    .size(90.dp)
                     .clip(CircleShape)
                     .background(PrimaryDark),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Profile Image",
-                    modifier = Modifier.size(100.dp),
-                    tint = Color(0xFFA0B3C9)
-                )
+                ProfilePicture()
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -177,4 +173,13 @@ fun MyProfileScreen(
             }
         }
     }
+}
+
+@Composable
+fun ProfilePicture() {
+    Image(
+        painter = painterResource(id = R.drawable.profile),
+        contentDescription = "Profile Image",
+        modifier = Modifier.size(35.dp)
+    )
 }
