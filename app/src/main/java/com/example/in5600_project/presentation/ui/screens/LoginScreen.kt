@@ -50,10 +50,10 @@ fun LoginScreen(
         ) {
             //Logo
             Image(
-                painter = painterResource(id = R.drawable.my_logo),
+                painter = painterResource(id = R.drawable.carcrash),
                 contentDescription = "App logo",
                 modifier = Modifier
-                    .size(100.dp)
+                    .size(250.dp)
                     .padding(bottom = 24.dp)
             )
 

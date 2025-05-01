@@ -432,7 +432,7 @@ fun ClaimInfoScreen(
                                 } else {
                                     Toast.makeText(
                                         context,
-                                        "Failed to update claim",
+                                        "Offline - failed to update claim",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 }
@@ -482,7 +482,7 @@ fun DisplayClaimImage(fileName: String, context: Context, modifier: Modifier) {
         Image(bitmap = bitmap!!, contentDescription = "Claim Photo", modifier = modifier)
     } else {
         Box(modifier = modifier, contentAlignment = Alignment.Center) {
-            Text("Loading image...")
+            Text("No image found...")
         }
     }
 }

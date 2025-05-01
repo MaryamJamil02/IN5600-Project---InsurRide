@@ -80,7 +80,7 @@ fun MyProfileScreen(
                     .size(90.dp)
                     .clip(CircleShape)
                     .background(PrimaryDark),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.BottomEnd
             ) {
                 ProfilePicture()
             }
@@ -178,8 +178,8 @@ fun MyProfileScreen(
 @Composable
 fun ProfilePicture() {
     Image(
-        painter = painterResource(id = R.drawable.profile),
+        painter = painterResource(id = R.drawable.person),
         contentDescription = "Profile Image",
-        modifier = Modifier.size(35.dp)
+        modifier = Modifier.size(110.dp)
     )
 }
