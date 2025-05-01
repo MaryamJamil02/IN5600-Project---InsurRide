@@ -13,7 +13,6 @@ class LoginViewModel : ViewModel() {
     private val _password = MutableStateFlow("")
     val password = _password.asStateFlow()
 
-
     fun onEmailChanged(newEmail: String) {
         _email.value = newEmail
     }
@@ -22,6 +21,7 @@ class LoginViewModel : ViewModel() {
         _password.value = newPassword
     }
 
+    // Clear the input fields
     fun clearFields() {
         _email.value = ""
         _password.value = ""

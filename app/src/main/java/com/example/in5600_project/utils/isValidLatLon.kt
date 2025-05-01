@@ -1,11 +1,13 @@
 package com.example.in5600_project.utils
 
+// Check if coordinate is valid
 fun isValidLatLon(coordinate: String?): Boolean {
+
+    // Check if coordinate is null or empty
     if (coordinate.isNullOrEmpty()) {
         return false
     }
 
-    // Attempt to split by comma
     val parts = coordinate.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
     if (parts.size != 2) {
         return false
@@ -24,9 +26,9 @@ fun isValidLatLon(coordinate: String?): Boolean {
             return false
         }
 
-        // If we get here, both values are valid
         return true
     } catch (e: NumberFormatException) {
+
         // Parsing failed
         return false
     }

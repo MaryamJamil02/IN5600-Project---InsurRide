@@ -24,33 +24,26 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChangePasswordScreen(
-    modifier: Modifier = Modifier,
-    viewModel: MyProfileViewModel,
-    navController: NavController
+    modifier: Modifier = Modifier, viewModel: MyProfileViewModel, navController: NavController
 ) {
+
     val changePasswordVM: ChangePasswordScreenViewModel = viewModel()
     val userId by viewModel.currentUserId.collectAsState()
     val newPassword by changePasswordVM.newPassword.collectAsState()
 
-    // local toggle for showing/hiding the password
+    // Local toggle for showing/hiding the password
     var passwordVisible by remember { mutableStateOf(false) }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    GoBackButton(navController)
-                },
-                title = {
-                    Text(
-                        "Change Password",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+    Scaffold(topBar = {
+        TopAppBar(navigationIcon = {
+            GoBackButton(navController)
+        }, title = {
+            Text(
+                "Change Password", fontSize = 22.sp, fontWeight = FontWeight.Bold
             )
-        }
-    ) { innerPadding ->
+        })
+    }) { innerPadding ->
+
         Column(
             modifier = modifier
                 .fillMaxSize()
@@ -58,8 +51,9 @@ fun ChangePasswordScreen(
                 .padding(horizontal = 16.dp, vertical = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            OutlinedTextField(
-                value = newPassword,
+
+            // Input field for new password
+            OutlinedTextField(value = newPassword,
                 onValueChange = { changePasswordVM.onNewPasswordChanged(it) },
                 label = { Text("New Password") },
                 singleLine = true,
@@ -68,14 +62,10 @@ fun ChangePasswordScreen(
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            imageVector = if (passwordVisible)
-                                Icons.Filled.Visibility
-                            else
-                                Icons.Filled.VisibilityOff,
-                            contentDescription = if (passwordVisible)
-                                "Hide password"
-                            else
-                                "Show password"
+                            imageVector = if (passwordVisible) Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff,
+                            contentDescription = if (passwordVisible) "Hide password"
+                            else "Show password"
                         )
                     }
                 },
@@ -87,9 +77,9 @@ fun ChangePasswordScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
+            // Button to change password
             Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
+                modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center
             ) {
                 ChangePasswordButton(
                     userId = userId,

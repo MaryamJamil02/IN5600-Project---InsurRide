@@ -37,24 +37,26 @@ import com.example.in5600_project.presentation.viewmodel.NewClaimViewModel
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
 
 
-
 @Composable
-fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) {
+fun MultipleScreenNavigator(modifier: Modifier) {
+
     val navController = rememberNavController()
 
-    // Create one instance of the ViewModel at this higher level
     val myProfileViewModel: MyProfileViewModel = viewModel()
-    //LATERFIX : LOGIN VIEWMODEL - may have to delete this one - double
     val loginViewModel: LoginViewModel = viewModel()
     val claimViewModel: NewClaimViewModel = viewModel()
+
     val context = LocalContext.current
     val claimsManager = remember { ClaimsManager(context) }
     val userId by myProfileViewModel.currentUserId.collectAsState()
 
-    // Collect claims state from ClaimsManager using getUserClaims function.
+    // Collect claims state from ClaimsManager using getUserClaims function
     val claims by claimsManager.getUserClaims(userId).collectAsState(initial = emptyList())
 
+
     NavHost(navController = navController, startDestination = "loginScreen") {
+
+        // LOGIN SCREEN
         composable("loginScreen") {
             LoginScreen(
                 modifier = modifier,
@@ -63,13 +65,15 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
                 viewModel = loginViewModel
             )
         }
+
+        // HOME SCREEN
         composable("claimsHomeScreen") {
             ClaimsHomeScreen(
-                modifier = modifier,
-                navController = navController,
-                claims = claims
+                modifier = modifier, navController = navController, claims = claims
             )
         }
+
+        // MY PROFILE SCREEN
         composable("myProfileScreen") {
             MyProfileScreen(
                 navController = navController,
@@ -78,15 +82,15 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
             )
         }
 
-        composable("changePasswordScreen"){
+        // CHANGE PASSWORD SCREEN
+        composable("changePasswordScreen") {
             ChangePasswordScreen(
-                modifier = modifier,
-                navController = navController,
-                viewModel = myProfileViewModel
+                modifier = modifier, navController = navController, viewModel = myProfileViewModel
             )
         }
 
-        composable("newClaimScreen"){
+        // NEW CLAIM SCREEN
+        composable("newClaimScreen") {
             NewClaimScreen(
                 modifier = modifier,
                 navController = navController,
@@ -95,14 +99,16 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
             )
         }
 
+        // CLAIM INFO SCREEN
+        // Pass the claimId as a route parameter
         composable("claimInfoScreen/{claimId}") { backStackEntry ->
             val claimId = backStackEntry.arguments?.getString("claimId") ?: ""
 
             val claimInfoViewModel: ClaimInfoViewModel = viewModel()
 
             // Find the claim in the list by matching claimId.
-            val claim: ClaimInformation = claims.find { it.claimId == claimId }
-                ?: ClaimInformation("", "", "", "", "")
+            val claim: ClaimInformation =
+                claims.find { it.claimId == claimId } ?: ClaimInformation("", "", "", "", "")
             ClaimInfoScreen(
                 modifier = modifier,
                 claim = claim,
@@ -115,6 +121,7 @@ fun MultipleScreenNavigator(modifier: Modifier, packageManager: PackageManager) 
     }
 }
 
+
 @Composable
 fun AppBottomBar(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -124,51 +131,44 @@ fun AppBottomBar(navController: NavController) {
     val colorIndicator = Color(0x95748DB4)
 
     NavigationBar {
+
         // HOME
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
+        NavigationBarItem(icon = { Icon(Icons.Default.Home, contentDescription = "Home") },
             label = { Text("Home") },
             selected = currentRoute == "claimsHomeScreen",
             onClick = {
-                navController.navigate(
-                    route = "claimsHomeScreen",
-                    navOptions = navOptions {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                )
+                navController.navigate(route = "claimsHomeScreen", navOptions = navOptions {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                })
             },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor     = colorSelected,
-                selectedTextColor     = colorSelected,
-                unselectedIconColor   = Color.Gray,
-                unselectedTextColor   = Color.Gray,
-                indicatorColor        = colorIndicator
+                selectedIconColor = colorSelected,
+                selectedTextColor = colorSelected,
+                unselectedIconColor = Color.Gray,
+                unselectedTextColor = Color.Gray,
+                indicatorColor = colorIndicator
             )
         )
 
         // MY PROFILE
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Person, contentDescription = "My Profile") },
+        NavigationBarItem(icon = { Icon(Icons.Default.Person, contentDescription = "My Profile") },
             label = { Text("My Profile") },
             selected = currentRoute == "myProfileScreen",
             onClick = {
-                navController.navigate(
-                    route = "myProfileScreen",
-                    navOptions = navOptions {
-                        popUpTo(navController.graph.startDestinationId) { saveState = true }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
-                )
+                navController.navigate(route = "myProfileScreen", navOptions = navOptions {
+                    popUpTo(navController.graph.startDestinationId) { saveState = true }
+                    launchSingleTop = true
+                    restoreState = true
+                })
             },
             colors = NavigationBarItemDefaults.colors(
-                selectedIconColor     = colorSelected,
-                selectedTextColor     = colorSelected,
-                unselectedIconColor   = Color.Gray,
-                unselectedTextColor   = Color.Gray,
-                indicatorColor        = colorIndicator
+                selectedIconColor = colorSelected,
+                selectedTextColor = colorSelected,
+                unselectedIconColor = Color.Gray,
+                unselectedTextColor = Color.Gray,
+                indicatorColor = colorIndicator
             )
         )
     }

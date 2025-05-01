@@ -16,7 +16,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             IN5600ProjectTheme {
                 Surface {
-                    MultipleScreenNavigator(modifier = Modifier, packageManager = packageManager)
+                    MultipleScreenNavigator(modifier = Modifier)
                 }
             }
         }

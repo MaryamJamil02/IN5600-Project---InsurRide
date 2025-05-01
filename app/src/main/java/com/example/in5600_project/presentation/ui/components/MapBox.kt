@@ -16,8 +16,6 @@ import com.mapbox.maps.extension.compose.annotation.generated.PointAnnotation
 import com.mapbox.maps.extension.compose.annotation.rememberIconImage
 
 
-
-
 @Composable
 fun MapBox(
     initialLatitude: Double?,
@@ -25,19 +23,20 @@ fun MapBox(
     interactive: Boolean = true,
     onLocationChanged: (Double, Double) -> Unit = { _, _ -> }
 ) {
+
     // Track the marker position internally for immediate UI feedback
     var markerLatitude by remember { mutableStateOf(initialLatitude) }
     var markerLongitude by remember { mutableStateOf(initialLongitude) }
 
     // Set up the map state (camera position, zoom, etc.)
-    // If we have an initial lat/long, we use it; otherwise pick some default center, e.g. Oslo.
+    // If we have an initial lat/long, we use it, otherwise pick some default center
     val mapState = rememberMapViewportState {
         setCameraOptions {
             zoom(5.0)
             if (markerLatitude != null && markerLongitude != null) {
                 center(Point.fromLngLat(markerLongitude!!, markerLatitude!!))
             } else {
-                // If no pin, default to Oslo or anywhere you prefer:
+                // Set default to Oslo
                 center(Point.fromLngLat(10.7522, 59.9139))
             }
             pitch(0.0)
@@ -47,31 +46,33 @@ fun MapBox(
 
     // Icon for the marker
     val markerIcon = rememberIconImage(
-        key = R.drawable.red_marker,
-        painter = painterResource(R.drawable.red_marker)
+        key = R.drawable.red_marker, painter = painterResource(R.drawable.red_marker)
     )
 
-    // Provide an onMapClickListener only if interactive == true
+    // Map click listener
     val onMapClickListener = if (interactive) {
         { point: Point ->
+
             // Place the marker at the tapped location
             markerLatitude = point.latitude()
             markerLongitude = point.longitude()
 
-            // Notify the parent
+            // Update the map view to show the marker
             onLocationChanged(markerLatitude!!, markerLongitude!!)
 
-            // Return true to indicate the tap was handled
             true
         }
     } else {
         null
     }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(200.dp)
     ) {
+
+        // Show the map
         MapboxMap(
             modifier = Modifier.fillMaxSize(),
             mapViewportState = mapState,

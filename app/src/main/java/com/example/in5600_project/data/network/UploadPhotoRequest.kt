@@ -12,38 +12,35 @@ import java.io.InputStream
 import kotlin.coroutines.resume
 
 suspend fun postMethodUploadPhoto(
-    context: Context,
-    userId: String,
-    claimId: String,
-    fileName: String,
-    imageUri: Uri
+    context: Context, userId: String, claimId: String, fileName: String, imageUri: Uri
 ): String? = suspendCancellableCoroutine { cont ->
 
     val imageStringBase64 = convertImageUriToBase64(context, imageUri)
+
     if (imageStringBase64 == null) {
         cont.resume(null)
+
+        // Cancel the coroutine if imageStringBase64 is null
         return@suspendCancellableCoroutine
     }
 
     val queue = Volley.newRequestQueue(context)
     val baseUrl = "http://10.0.2.2:8080/postMethodUploadPhoto"
-    val postUrl = "$baseUrl?userId=$userId&claimId=$claimId&fileName=$fileName&imageStringBase64=$imageStringBase64"
+    val postUrl =
+        "$baseUrl?userId=$userId&claimId=$claimId&fileName=$fileName&imageStringBase64=$imageStringBase64"
 
-    val stringRequest = object : StringRequest(
-        Request.Method.POST,
-        postUrl,
-        Response.Listener { response ->
+    val stringRequest =
+        object : StringRequest(Request.Method.POST, postUrl, Response.Listener { response ->
             cont.resume(response)
-        },
-        Response.ErrorListener { error ->
+        }, Response.ErrorListener { error ->
             error.printStackTrace()
             cont.resume(null)
-        }
-    ) {}
+        }) {}
 
     queue.add(stringRequest)
 }
 
+// Helper function to convert an image URI to a Base64-encoded string
 fun convertImageUriToBase64(context: Context, imageUri: Uri): String? {
     try {
         val inputStream: InputStream? = context.contentResolver.openInputStream(imageUri)

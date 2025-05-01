@@ -14,12 +14,12 @@ suspend fun getMethodMyClaimsPhoto(context: Context, id: String): Array<String>?
     suspendCancellableCoroutine { cont ->
         val queue = Volley.newRequestQueue(context)
         val url = "http://10.0.2.2:8080/getMethodMyClaimsPhoto?id=$id"
-        val jsonArrayRequest = object : JsonArrayRequest(
-            Request.Method.GET,
+        val jsonArrayRequest = object : JsonArrayRequest(Request.Method.GET,
             url,
             null,
             Response.Listener<JSONArray> { response ->
                 try {
+                    // Convert the JSONArray to an array of strings
                     val photoArray = Array(response.length()) { i -> response.getString(i) }
                     cont.resume(photoArray)
                 } catch (e: JSONException) {
@@ -30,8 +30,7 @@ suspend fun getMethodMyClaimsPhoto(context: Context, id: String): Array<String>?
             Response.ErrorListener { error ->
                 error.printStackTrace()
                 cont.resume(null)
-            }
-        ) {}
+            }) {}
         queue.add(jsonArrayRequest)
     }
 

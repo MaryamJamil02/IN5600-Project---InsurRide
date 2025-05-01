@@ -10,14 +10,13 @@ import androidx.navigation.NavController
 @Composable
 fun GoBackButton(navController: NavController, onReset: () -> Unit = {}) {
     IconButton(onClick = {
+
+        // Reset the form fields
         onReset()
         navController.popBackStack()
-
-
     }) {
         Icon(
-            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-            contentDescription = "Go Back"
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Go Back"
         )
     }
 }

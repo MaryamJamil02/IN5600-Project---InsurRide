@@ -56,37 +56,34 @@ fun ClaimInfoScreen(
     context: Context,
     userId: String
 ) {
+
     val coroutineScope = rememberCoroutineScope()
     val claimsManager = ClaimsManager(context)
     var expanded by remember { mutableStateOf(false) }
     val coordinates = claim.claimLocation
 
+    // Launch an activity to get an image from the gallery
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         uri?.let { viewModel.onPhotoChanged(it.toString()) }
     }
 
+    // Fetch the photo from the server and update the photo state
     LaunchedEffect(claim.claimPhoto) {
         if (!viewModel.isEditMode.value && claim.claimPhoto.isNotEmpty()) {
             viewModel.fetchPhoto(context, claim.claimPhoto)
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = { GoBackButton(navController) },
-                title = {
-                    Text(
-                        "Claim Information",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+    Scaffold(topBar = {
+        TopAppBar(navigationIcon = { GoBackButton(navController) }, title = {
+            Text(
+                "Claim Information", fontSize = 22.sp, fontWeight = FontWeight.Bold
             )
-        }
-    ) { innerPadding ->
+        })
+    }) { innerPadding ->
+
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -94,20 +91,22 @@ fun ClaimInfoScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            if (!viewModel.isEditMode.value) {
-                // —— VIEW MODE ——
 
+            // —— VIEW MODE ——
+            if (!viewModel.isEditMode.value) {
+
+                // Edit button
                 item {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.End
+                        modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End
                     ) {
                         IconButton(
                             onClick = {
                                 viewModel.enterEditMode(claim)
                                 viewModel.fetchPhoto(context, claim.claimPhoto)
-                            },
-                            Modifier.background(color = Color(0xFFE3F2FD), shape = RoundedCornerShape(50))
+                            }, Modifier.background(
+                                color = Color(0xFFE3F2FD), shape = RoundedCornerShape(50)
+                            )
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Edit,
@@ -118,6 +117,7 @@ fun ClaimInfoScreen(
                     }
                 }
 
+                // Claim information
                 item {
                     Card(
                         modifier = Modifier
@@ -133,7 +133,10 @@ fun ClaimInfoScreen(
                                 .padding(16.dp),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
+
                             Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                // Claim ID
                                 Icon(
                                     imageVector = Icons.Filled.Tag,
                                     contentDescription = null,
@@ -148,6 +151,8 @@ fun ClaimInfoScreen(
                                 )
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                // Claim status
                                 Icon(
                                     imageVector = Icons.Filled.Info,
                                     contentDescription = null,
@@ -163,7 +168,10 @@ fun ClaimInfoScreen(
                                 Spacer(Modifier.width(4.dp))
                                 StatusBadge(status = claim.claimStatus)
                             }
+
                             Row(verticalAlignment = Alignment.CenterVertically) {
+
+                                // Claim description
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.Message,
                                     contentDescription = null,
@@ -182,6 +190,8 @@ fun ClaimInfoScreen(
                 }
 
                 item {
+
+                    // Claim location
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -199,12 +209,16 @@ fun ClaimInfoScreen(
                             Text("Location", style = MaterialTheme.typography.titleMedium)
                             if (isValidLatLon(coordinates)) {
                                 val parts = coordinates.split(",")
+
+                                // Display the map with the claim location
                                 MapBox(
                                     parts[0].trim().toDouble(),
                                     parts[1].trim().toDouble(),
                                     interactive = false
                                 )
                             } else {
+
+                                // Display the map with no claim location
                                 MapBox(
                                     initialLatitude = null,
                                     initialLongitude = null,
@@ -216,6 +230,8 @@ fun ClaimInfoScreen(
                 }
 
                 item {
+
+                    // Claim photo
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -231,6 +247,8 @@ fun ClaimInfoScreen(
                             verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             Text("Photo", style = MaterialTheme.typography.titleMedium)
+
+                            // Display the claim photo
                             DisplayClaimImage(
                                 fileName = claim.claimPhoto,
                                 context = context,
@@ -246,7 +264,10 @@ fun ClaimInfoScreen(
             } else {
                 // —— EDIT MODE ——
 
+                // Claim information
                 item {
+
+                    // Claim description
                     OutlinedTextField(
                         value = viewModel.description.value,
                         onValueChange = { viewModel.onDescriptionChanged(it) },
@@ -258,11 +279,14 @@ fun ClaimInfoScreen(
                 }
 
                 item {
+
                     Box(
                         Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                     ) {
+
+                        // Claim status
                         OutlinedTextField(
                             value = viewModel.status.value,
                             onValueChange = {},
@@ -281,19 +305,18 @@ fun ClaimInfoScreen(
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             viewModel.statusOptions.forEach { status ->
-                                DropdownMenuItem(
-                                    text = { Text(status) },
-                                    onClick = {
-                                        viewModel.onStatusChanged(status)
-                                        expanded = false
-                                    }
-                                )
+                                DropdownMenuItem(text = { Text(status) }, onClick = {
+                                    viewModel.onStatusChanged(status)
+                                    expanded = false
+                                })
                             }
                         }
                     }
                 }
 
                 item {
+
+                    // Claim location
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -311,6 +334,8 @@ fun ClaimInfoScreen(
                             Text("Location", style = MaterialTheme.typography.titleMedium)
                             if (isValidLatLon(coordinates)) {
                                 val parts = coordinates.split(",")
+
+                                // Display the map with the claim location
                                 MapBox(
                                     initialLatitude = parts[0].trim().toDouble(),
                                     initialLongitude = parts[1].trim().toDouble(),
@@ -319,6 +344,8 @@ fun ClaimInfoScreen(
                                     viewModel.onLocationChanged("$newLat, $newLong")
                                 }
                             } else {
+
+                                // Display the map with no claim location
                                 MapBox(
                                     initialLatitude = null,
                                     initialLongitude = null,
@@ -332,6 +359,8 @@ fun ClaimInfoScreen(
                 }
 
                 item {
+
+                    // Claim photo
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -369,6 +398,8 @@ fun ClaimInfoScreen(
                                         tint = Color(0xFF213555)
                                     )
                                 }
+
+                                // Display the claim photo
                                 if (viewModel.photo.value.isNotEmpty()) {
                                     AsyncImage(
                                         model = viewModel.photo.value,
@@ -380,6 +411,8 @@ fun ClaimInfoScreen(
                                             .clip(RoundedCornerShape(8.dp))
                                     )
                                 } else {
+
+                                    // Display default image if no photo is selected
                                     DisplayClaimImage(
                                         fileName = claim.claimPhoto,
                                         context = context,
@@ -398,18 +431,34 @@ fun ClaimInfoScreen(
                     Button(
                         onClick = {
                             coroutineScope.launch {
+
+                                // Update the claim
                                 val fullUri = viewModel.photo.value
+
+                                // Extract the file name from the URI
                                 val cleanedFileName = fullUri.substringAfterLast('/')
+
+                                // Update the claim to the server
                                 val responseUpdatedClaim = postUpdateClaim(
-                                    context, userId, claim.claimId,
+                                    context,
+                                    userId,
+                                    claim.claimId,
                                     viewModel.description.value,
-                                    cleanedFileName, viewModel.location.value,
+                                    cleanedFileName,
+                                    viewModel.location.value,
                                     viewModel.status.value
                                 )
+
+                                //  Upload the photo to the server
                                 val responseUpdatePhoto = postMethodUploadPhoto(
-                                    context, userId, claim.claimId,
-                                    cleanedFileName, Uri.parse(fullUri)
+                                    context,
+                                    userId,
+                                    claim.claimId,
+                                    cleanedFileName,
+                                    Uri.parse(fullUri)
                                 )
+
+                                // Check if the update was successful
                                 if (responseUpdatedClaim != null && responseUpdatePhoto != null) {
                                     val updatedClaim = ClaimInformation(
                                         claimId = claim.claimId,
@@ -418,17 +467,20 @@ fun ClaimInfoScreen(
                                         claimLocation = viewModel.location.value,
                                         claimStatus = viewModel.status.value
                                     )
+
+                                    // Update the claim in the local datastore
                                     claimsManager.updateOrInsertClaimAtIndex(
-                                        userId, claim.claimId.toInt(),
-                                        updatedClaim, false
+                                        userId, claim.claimId.toInt(), updatedClaim, false
                                     )
+
                                     Toast.makeText(
-                                        context,
-                                        "Claim updated successfully",
-                                        Toast.LENGTH_SHORT
+                                        context, "Claim updated successfully", Toast.LENGTH_SHORT
                                     ).show()
+
+                                    // Navigate back to the claim list screen and exit edit mode
                                     navController.popBackStack()
                                     viewModel.exitEditMode()
+
                                 } else {
                                     Toast.makeText(
                                         context,
@@ -437,8 +489,7 @@ fun ClaimInfoScreen(
                                     ).show()
                                 }
                             }
-                        },
-                        modifier = Modifier
+                        }, modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 8.dp)
                     ) {
@@ -450,15 +501,21 @@ fun ClaimInfoScreen(
     }
 }
 
-// Try cache first; otherwise download, cache, and decode
+// Generate a bitmap from a file name
 suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap? {
+
     val cacheFile = File(context.filesDir, fileName)
     if (cacheFile.exists()) {
-        return BitmapFactory.decodeFile(cacheFile.absolutePath)
-            ?.asImageBitmap()
+        return BitmapFactory.decodeFile(cacheFile.absolutePath)?.asImageBitmap()
     }
+
+    // Download the photo from the server
     val base64String = getMethodDownloadPhoto(context, fileName) ?: return null
+
     val imageBytes = Base64.decode(base64String, Base64.NO_WRAP or Base64.URL_SAFE)
+
+
+    // Convert the image bytes to a bitmap
     BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)?.let { bmp ->
         try {
             FileOutputStream(cacheFile).use { out ->
@@ -468,12 +525,15 @@ suspend fun generateClaimBitmap(fileName: String, context: Context): ImageBitmap
             e.printStackTrace()
         }
     }
-    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)
-        ?.asImageBitmap()
+
+    return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.size)?.asImageBitmap()
 }
 
+// Display a claim image
 @Composable
 fun DisplayClaimImage(fileName: String, context: Context, modifier: Modifier) {
+
+    // Generate the bitmap
     var bitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(fileName) {
         bitmap = generateClaimBitmap(fileName, context)

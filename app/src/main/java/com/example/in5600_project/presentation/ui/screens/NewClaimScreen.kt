@@ -72,27 +72,18 @@ fun NewClaimScreen(
         } else null to null
     }
 
+    // Clean file name
     val cleanedFileName = imageUri?.lastPathSegment?.substringBeforeLast(".") ?: ""
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                navigationIcon = {
-                    GoBackButton(
-                        navController,
-                        onReset = { claimViewModel.reset() }
-                    )
-                },
-                title = {
-                    Text(
-                        "Add New Claim",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+    Scaffold(topBar = {
+        TopAppBar(navigationIcon = {
+            GoBackButton(navController, onReset = { claimViewModel.reset() })
+        }, title = {
+            Text(
+                "Add New Claim", fontSize = 22.sp, fontWeight = FontWeight.Bold
             )
-        }
-    ) { innerPadding ->
+        })
+    }) { innerPadding ->
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -100,7 +91,7 @@ fun NewClaimScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // 1) Description field
+            // Description field
             item {
                 OutlinedTextField(
                     value = description,
@@ -112,7 +103,7 @@ fun NewClaimScreen(
                 )
             }
 
-            // 2) Status dropdown
+            // Status dropdown
             item {
                 Box(
                     modifier = Modifier
@@ -140,19 +131,16 @@ fun NewClaimScreen(
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         statusOptions.forEach { status ->
-                            DropdownMenuItem(
-                                text = { Text(status) },
-                                onClick = {
-                                    claimViewModel.onStatusSelected(status)
-                                    expanded = false
-                                }
-                            )
+                            DropdownMenuItem(text = { Text(status) }, onClick = {
+                                claimViewModel.onStatusSelected(status)
+                                expanded = false
+                            })
                         }
                     }
                 }
             }
 
-            // 3) Photo section
+            // Photo section
             item {
                 Card(
                     modifier = Modifier
@@ -191,7 +179,7 @@ fun NewClaimScreen(
                 }
             }
 
-            // 4) Location section
+            // Location section
             item {
                 Card(
                     modifier = Modifier
@@ -219,7 +207,7 @@ fun NewClaimScreen(
                 }
             }
 
-            // 5) Create Claim area
+            // Create Claim
             item {
                 Box(
                     modifier = Modifier
@@ -227,7 +215,8 @@ fun NewClaimScreen(
                         .padding(vertical = 8.dp)
                 ) {
                     if (description.isNotBlank() && location.isNotBlank() && imageUri != null) {
-                        // full-width NewClaimButton
+
+                        // New Claim Button
                         NewClaimButton(
                             userId = userId,
                             newClaimDescription = description,
@@ -243,19 +232,20 @@ fun NewClaimScreen(
                         Button(
                             onClick = {
                                 when {
-                                    description.isBlank() -> Toast
-                                        .makeText(context, "Please enter a description", Toast.LENGTH_SHORT)
-                                        .show()
-                                    imageUri == null -> Toast
-                                        .makeText(context, "Please select a photo", Toast.LENGTH_SHORT)
-                                        .show()
-                                    location.isBlank() -> Toast
-                                        .makeText(context, "Please select a location", Toast.LENGTH_SHORT)
-                                        .show()
+                                    description.isBlank() -> Toast.makeText(
+                                        context, "Please enter a description", Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    imageUri == null -> Toast.makeText(
+                                        context, "Please select a photo", Toast.LENGTH_SHORT
+                                    ).show()
+
+                                    location.isBlank() -> Toast.makeText(
+                                        context, "Please select a location", Toast.LENGTH_SHORT
+                                    ).show()
 
                                 }
-                            },
-                            modifier = Modifier.fillMaxWidth()
+                            }, modifier = Modifier.fillMaxWidth()
                         ) {
                             Text("Add New Claim")
                         }

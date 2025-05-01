@@ -24,12 +24,8 @@ fun ChangePasswordButton(userId: String, clearPassword: String) {
         // Hash the password before sending it to the server
         val hashedPassword: String = hashPassword(clearPassword)
 
-        println("Hashed Password: $hashedPassword")
-
-
         coroutineScope.launch {
             val email = userManager.getUserEmailString(userId)
-
 
             // Send the password change request to the server
             val response = methodPostChangePasswd(context, email, clearPassword, hashedPassword)
@@ -41,8 +37,6 @@ fun ChangePasswordButton(userId: String, clearPassword: String) {
             } else {
                 Toast.makeText(context, "Password change failed", Toast.LENGTH_SHORT).show()
             }
-
-
         }
     }) {
         Text("Change Password")

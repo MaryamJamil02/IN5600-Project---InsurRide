@@ -38,8 +38,7 @@ fun LoginScreen(
     var passwordVisible by remember { mutableStateOf(false) }
 
     Scaffold(
-        modifier = modifier.fillMaxSize(),
-        containerColor = Color.White
+        modifier = modifier.fillMaxSize(), containerColor = Color.White
     ) {
         Column(
             modifier = Modifier
@@ -57,12 +56,15 @@ fun LoginScreen(
                     .padding(bottom = 24.dp)
             )
 
+            // Welcome text
             Text(
                 text = "Welcome to InsurRide",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF333333)
             )
+
+            // Insurance text
             Text(
                 text = "Insurance made simple for drivers",
                 fontSize = 14.sp,
@@ -70,7 +72,7 @@ fun LoginScreen(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            //Email
+            // Email
             OutlinedTextField(
                 value = email,
                 onValueChange = { viewModel.onEmailChanged(it) },
@@ -90,18 +92,14 @@ fun LoginScreen(
                 onValueChange = { viewModel.onPasswordChanged(it) },
                 label = { Text("Password") },
                 singleLine = true,
-                visualTransformation =
-                if (passwordVisible) VisualTransformation.None
+                visualTransformation = if (passwordVisible) VisualTransformation.None
                 else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { passwordVisible = !passwordVisible }) {
                         Icon(
-                            imageVector = if (passwordVisible)
-                                Icons.Filled.Visibility
-                            else
-                                Icons.Filled.VisibilityOff,
-                            contentDescription =
-                            if (passwordVisible) "Hide password"
+                            imageVector = if (passwordVisible) Icons.Filled.Visibility
+                            else Icons.Filled.VisibilityOff,
+                            contentDescription = if (passwordVisible) "Hide password"
                             else "Show password"
                         )
                     }
@@ -114,7 +112,7 @@ fun LoginScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            //Login Button
+            // Login Button
             LoginButton(
                 modifier = Modifier
                     .fillMaxWidth()

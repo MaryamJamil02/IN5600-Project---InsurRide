@@ -37,34 +37,26 @@ import kotlinx.coroutines.withContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyProfileScreen(
-    navController: NavController,
-    viewModel: MyProfileViewModel,
-    loginViewModel: LoginViewModel
+    navController: NavController, viewModel: MyProfileViewModel, loginViewModel: LoginViewModel
 ) {
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     val userId by viewModel.currentUserId.collectAsState()
     val email by loginViewModel.email.collectAsState()
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "My Profile",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        )
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = "My Profile", style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold
                     )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = PrimaryDark,
-                    titleContentColor = Color.White
                 )
+            }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = PrimaryDark, titleContentColor = Color.White
             )
-        },
-        bottomBar = { AppBottomBar(navController) }
-    ) { innerPadding ->
+        )
+    }, bottomBar = { AppBottomBar(navController) }) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -74,7 +66,7 @@ fun MyProfileScreen(
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Profile Avatar
+            // Profile picture
             Box(
                 modifier = Modifier
                     .size(90.dp)
@@ -89,8 +81,7 @@ fun MyProfileScreen(
 
             // User Info Card
             Card(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
@@ -103,11 +94,9 @@ fun MyProfileScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Text(
-                            text = userId.takeIf { it.isNotBlank() } ?: "N/A",
+                        Text(text = userId.takeIf { it.isNotBlank() } ?: "N/A",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
-                        )
+                            fontWeight = FontWeight.Medium)
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Row(
@@ -119,18 +108,16 @@ fun MyProfileScreen(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                        Text(
-                            text = email.takeIf { it.isNotBlank() } ?: "N/A",
+                        Text(text = email.takeIf { it.isNotBlank() } ?: "N/A",
                             style = MaterialTheme.typography.bodyMedium,
-                            fontWeight = FontWeight.Medium
-                        )
+                            fontWeight = FontWeight.Medium)
                     }
                 }
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Action Buttons
+            // Logout and Change Password Buttons
             Column(modifier = Modifier.fillMaxWidth()) {
 
                 OutlinedButton(
@@ -159,8 +146,7 @@ fun MyProfileScreen(
                                 }
                             }
                         }
-                    },
-                    modifier = Modifier
+                    }, modifier = Modifier
                         .fillMaxWidth()
                         .height(48.dp)
                 ) {
@@ -175,6 +161,7 @@ fun MyProfileScreen(
     }
 }
 
+// Profile picture
 @Composable
 fun ProfilePicture() {
     Image(

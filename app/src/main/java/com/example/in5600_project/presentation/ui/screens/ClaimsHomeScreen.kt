@@ -17,7 +17,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.in5600_project.data.datastore.ClaimInformation
 import com.example.in5600_project.navigation.AppBottomBar
@@ -26,29 +25,21 @@ import com.example.in5600_project.presentation.ui.theme.PrimaryDark
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ClaimsHomeScreen(
-    modifier: Modifier = Modifier,
-    navController: NavController,
-    claims: List<ClaimInformation>
+    modifier: Modifier = Modifier, navController: NavController, claims: List<ClaimInformation>
 ) {
-    Scaffold(
-        bottomBar = { AppBottomBar(navController) },
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text = "My Claims",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        )
+    Scaffold(bottomBar = { AppBottomBar(navController) }, topBar = {
+        CenterAlignedTopAppBar(
+            title = {
+                Text(
+                    text = "My Claims", style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold
                     )
-                },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = PrimaryDark,
-                    titleContentColor = Color.White
                 )
+            }, colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = PrimaryDark, titleContentColor = Color.White
             )
-        }
-    ) { innerPadding ->
+        )
+    }) { innerPadding ->
 
         Column(
             modifier = modifier
@@ -56,9 +47,10 @@ fun ClaimsHomeScreen(
                 .padding(innerPadding)
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally  // center children
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
+            // Add New Claim Button
             IconButton(
                 onClick = { navController.navigate("newClaimScreen") },
                 modifier = Modifier
@@ -74,10 +66,8 @@ fun ClaimsHomeScreen(
                 )
             }
 
-
             ClaimsListScreen(
-                claims = claims,
-                navController = navController
+                claims = claims, navController = navController
             )
         }
     }

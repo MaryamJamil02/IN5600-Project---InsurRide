@@ -20,19 +20,17 @@ suspend fun postUpdateClaim(
 
     val queue = Volley.newRequestQueue(context)
     val baseUrl = "http://10.0.2.2:8080/postUpdateClaim"
-    val postUrl = "$baseUrl?userId=$userId&indexUpdateClaim=$indexUpdateClaim&updateClaimDes=$updateClaimDescription&updateClaimPho=$updateClaimPhoto&updateClaimLoc=$updateClaimLocation&updateClaimSta=$updateClaimStatus"
+    val postUrl =
+        "$baseUrl?userId=$userId&indexUpdateClaim=$indexUpdateClaim&updateClaimDes=$updateClaimDescription&updateClaimPho=$updateClaimPhoto&updateClaimLoc=$updateClaimLocation&updateClaimSta=$updateClaimStatus"
 
-    val stringRequest = object : StringRequest(
-        Request.Method.POST,
-        postUrl,
-        Response.Listener { response ->
+    // Create a StringRequest with a POST method
+    val stringRequest =
+        object : StringRequest(Request.Method.POST, postUrl, Response.Listener { response ->
             cont.resume(response)
-        },
-        Response.ErrorListener { error ->
+        }, Response.ErrorListener { error ->
             error.printStackTrace()
             cont.resume(null)
-        }
-    ) {}
+        }) {}
 
     queue.add(stringRequest)
 }

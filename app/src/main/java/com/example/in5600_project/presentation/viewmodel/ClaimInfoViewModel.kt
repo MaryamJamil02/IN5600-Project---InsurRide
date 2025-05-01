@@ -13,14 +13,12 @@ class ClaimInfoViewModel : ViewModel() {
     var description = mutableStateOf("")
         private set
 
-    // This is what we actually send to the server for updated claim coords
     var location = mutableStateOf("")
         private set
 
     var status = mutableStateOf("Pending")
         private set
 
-    // Store the full Uri (content://...) so we can display and read from it.
     var photo = mutableStateOf("")
         private set
 
@@ -32,7 +30,7 @@ class ClaimInfoViewModel : ViewModel() {
 
     fun enterEditMode(claim: ClaimInformation) {
         description.value = claim.claimDes
-        location.value = claim.claimLocation  // Use the existing location from the claim
+        location.value = claim.claimLocation
         status.value = claim.claimStatus
         photo.value = ""
         isEditMode.value = true
@@ -58,13 +56,14 @@ class ClaimInfoViewModel : ViewModel() {
         photo.value = newPhotoUri
     }
 
+    // Fetch the photo from the server and update the photo state
     fun fetchPhoto(context: Context, fileName: String) {
         viewModelScope.launch {
             val base64String = getMethodDownloadPhoto(context, fileName)
             base64String?.let {
                 val uri = decodeBase64ToUri(context, it, fileName)
                 uri?.let { decodedUri ->
-                    onPhotoChanged(decodedUri.toString())  // store the full content:// path
+                    onPhotoChanged(decodedUri.toString())  // Store the full content:// path
                 }
             }
         }

@@ -13,18 +13,13 @@ suspend fun getMethodMyClaimsNumber(context: Context, id: String): String? =
     suspendCancellableCoroutine { cont ->
         val queue = Volley.newRequestQueue(context)
         val url = "http://10.0.2.2:8080/getMethodMyClaimsNumber?id=$id"
-        val stringRequest = object : StringRequest(
-            Request.Method.GET,
-            url,
-            Response.Listener { response ->
-                println("Response is: $response")
+        val stringRequest =
+            object : StringRequest(Request.Method.GET, url, Response.Listener { response ->
                 cont.resume(response)
-            },
-            Response.ErrorListener { error ->
+            }, Response.ErrorListener { error ->
                 error.printStackTrace()
                 cont.resume(null)
-            }
-        ) {}
+            }) {}
         queue.add(stringRequest)
     }
 

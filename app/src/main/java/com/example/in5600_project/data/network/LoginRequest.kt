@@ -18,20 +18,15 @@ data class Person(
 )
 
 suspend fun methodPostRemoteLogin(
-    context: Context,
-    email: String,
-    hashedPassword: String
+    context: Context, email: String, hashedPassword: String
 ): Person? = suspendCancellableCoroutine { cont ->
 
     val queue = Volley.newRequestQueue(context)
     val baseUrl = "http://10.0.2.2:8080/methodPostRemoteLogin"
     val postUrl = "$baseUrl?em=$email&ph=$hashedPassword"
 
-    val jsonObjectRequest = object : JsonObjectRequest(
-        Request.Method.POST,
-        postUrl,
-        null,
-        Response.Listener { response ->
+    val jsonObjectRequest = object :
+        JsonObjectRequest(Request.Method.POST, postUrl, null, Response.Listener { response ->
             try {
                 // Parse the JSON response into a Person object
                 val person = Person(
@@ -47,13 +42,10 @@ suspend fun methodPostRemoteLogin(
                 e.printStackTrace()
                 cont.resume(null)
             }
-        },
-        Response.ErrorListener { error ->
+        }, Response.ErrorListener { error ->
             error.printStackTrace()
             cont.resume(null)
-        }
-    ) {
-    }
+        }) {}
 
     queue.add(jsonObjectRequest)
 }

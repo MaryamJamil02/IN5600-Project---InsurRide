@@ -24,7 +24,7 @@ fun NewClaimButton(
     newClaimPhoto: String,
     newClaimLocation: String,
     newClaimStatus: String,
-    imageUri : Uri,
+    imageUri: Uri,
     navController: NavController,
     viewModel: NewClaimViewModel,
     modifier: Modifier
@@ -34,67 +34,65 @@ fun NewClaimButton(
     val claimsManager = ClaimsManager(context)
     val coroutineScope = rememberCoroutineScope()
 
-    Button(onClick = {
-        coroutineScope.launch {
-            val numberOfClaims = claimsManager.getNumberOfClaims(userId).first()
+    Button(
+        onClick = {
+            coroutineScope.launch {
+                val numberOfClaims = claimsManager.getNumberOfClaims(userId).first()
 
-            println("Number of claims: $numberOfClaims")
+                // Check if there are available slots for new claims
+                if (numberOfClaims >= 5) {
+                    Toast.makeText(context, "No available slot for new claim", Toast.LENGTH_SHORT)
+                        .show()
+                    return@launch
+                } else {
 
-            // Check if there are available slots for new claims
-            if (numberOfClaims >= 5) {
-                Toast.makeText(context, "No available slot for new claim", Toast.LENGTH_SHORT)
-                    .show()
-                return@launch
-            } else {
-
-                // Call the network method to insert a new claim on the server.
-                val responseNewClaim = postInsertNewClaim(
-                    context,
-                    userId,
-                    numberOfClaims.toString(),
-                    newClaimDescription,
-                    newClaimPhoto,
-                    newClaimLocation,
-                    newClaimStatus
-                )
-
-                val responseUploadPhoto = postMethodUploadPhoto(
-                    context,
-                    userId,
-                    numberOfClaims.toString(),
-                    newClaimPhoto,
-                    imageUri
-                )
-
-
-                if (responseNewClaim != null && responseUploadPhoto != null) {
-                    // Create a new ClaimInformation object.
-                    val newClaim = ClaimInformation(
-                        claimId = numberOfClaims.toString(),
-                        claimDes = newClaimDescription,
-                        claimPhoto = newClaimPhoto,
-                        claimLocation = newClaimLocation,
-                        claimStatus = newClaimStatus
+                    // Call the network method to insert a new claim on the server
+                    val responseNewClaim = postInsertNewClaim(
+                        context,
+                        userId,
+                        numberOfClaims.toString(),
+                        newClaimDescription,
+                        newClaimPhoto,
+                        newClaimLocation,
+                        newClaimStatus
                     )
 
-                    // Insert the new claim locally.
-                    claimsManager.updateOrInsertClaimAtIndex(userId, numberOfClaims, newClaim, true)
+                    // Upload the photo to the server
+                    val responseUploadPhoto = postMethodUploadPhoto(
+                        context, userId, numberOfClaims.toString(), newClaimPhoto, imageUri
+                    )
 
-                    // LATERFIX - navigate claiminfoscreen
+                    // Check if both operations were successful
+                    if (responseNewClaim != null && responseUploadPhoto != null) {
 
-                    Toast.makeText(context, "New claim added successfully", Toast.LENGTH_SHORT)
-                        .show()
+                        // Create a new ClaimInformation object
+                        val newClaim = ClaimInformation(
+                            claimId = numberOfClaims.toString(),
+                            claimDes = newClaimDescription,
+                            claimPhoto = newClaimPhoto,
+                            claimLocation = newClaimLocation,
+                            claimStatus = newClaimStatus
+                        )
 
-                    navController.navigate("claimInfoScreen/${numberOfClaims}")
-                    viewModel.reset()
+                        // Insert the new claim locally
+                        claimsManager.updateOrInsertClaimAtIndex(
+                            userId, numberOfClaims, newClaim, true
+                        )
 
-                } else {
-                    Toast.makeText(context, "Failed to add new claim", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "New claim added successfully", Toast.LENGTH_SHORT)
+                            .show()
+
+                        navController.navigate("claimInfoScreen/${numberOfClaims}")
+                        viewModel.reset()
+
+                    } else {
+                        Toast.makeText(context, "Failed to add new claim", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             }
-        }
-    },
-        modifier = modifier) {
+        }, modifier = modifier
+    ) {
         Text("Add New Claim")
     }
 }

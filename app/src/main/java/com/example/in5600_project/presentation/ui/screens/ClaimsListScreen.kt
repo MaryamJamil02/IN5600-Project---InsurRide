@@ -14,20 +14,16 @@ import com.example.in5600_project.presentation.ui.components.ClaimCard
 
 @Composable
 fun ClaimsListScreen(
-    claims: List<ClaimInformation>,
-    navController: NavController
+    claims: List<ClaimInformation>, navController: NavController
 ) {
     LazyColumn(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         itemsIndexed(claims) { index, claim ->
             ClaimCard(
-                displayNumber = index + 1,
-                claim = claim,
-                navController = navController
+                displayNumber = index + 1, claim = claim, navController = navController
             )
         }
     }

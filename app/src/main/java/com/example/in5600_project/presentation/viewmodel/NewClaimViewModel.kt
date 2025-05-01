@@ -5,26 +5,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 
 class NewClaimViewModel : ViewModel() {
-    // State for the claim description.
+
     var description = mutableStateOf("")
         private set
 
-    // State for the claim location.
     var location = mutableStateOf("")
         private set
 
-    // State for the selected claim status.
     var selectedStatus = mutableStateOf("Pending")
         private set
 
     // List of available status options.
     val statusOptions = listOf("Pending", "Approved", "Rejected")
 
-    // State for the selected image URI.
     var imageUri = mutableStateOf<Uri?>(null)
         private set
 
-    // Update functions for each state.
     fun onDescriptionChanged(newDescription: String) {
         description.value = newDescription
     }
@@ -41,8 +37,8 @@ class NewClaimViewModel : ViewModel() {
         imageUri.value = newUri
     }
 
+    // Reset the form fields
     fun reset() {
-        // Return everything to its default
         description.value = ""
         location.value = ""
         selectedStatus.value = "Pending"

@@ -14,12 +14,12 @@ suspend fun getMethodMyClaimsLocation(context: Context, id: String): Array<Strin
     suspendCancellableCoroutine { cont ->
         val queue = Volley.newRequestQueue(context)
         val url = "http://10.0.2.2:8080/getMethodMyClaimsLocation?id=$id"
-        val jsonArrayRequest = object : JsonArrayRequest(
-            Request.Method.GET,
+        val jsonArrayRequest = object : JsonArrayRequest(Request.Method.GET,
             url,
             null,
             Response.Listener<JSONArray> { response ->
                 try {
+                    // Convert the JSONArray to an array of strings
                     val locationArray = Array(response.length()) { i -> response.getString(i) }
                     cont.resume(locationArray)
                 } catch (e: JSONException) {
@@ -30,8 +30,7 @@ suspend fun getMethodMyClaimsLocation(context: Context, id: String): Array<Strin
             Response.ErrorListener { error ->
                 error.printStackTrace()
                 cont.resume(null)
-            }
-        ) {}
+            }) {}
         queue.add(jsonArrayRequest)
     }
 

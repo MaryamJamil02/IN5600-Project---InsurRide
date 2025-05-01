@@ -12,5 +12,4 @@ class MyProfileViewModel : ViewModel() {
     fun onUserIdChanged(newUserId: String) {
         _currentUserId.value = newUserId
     }
-
 }

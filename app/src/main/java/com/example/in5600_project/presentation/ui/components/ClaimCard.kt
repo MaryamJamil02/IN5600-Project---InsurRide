@@ -22,24 +22,23 @@ import com.example.in5600_project.presentation.ui.screens.DisplayClaimImage
 
 @Composable
 fun ClaimCard(
-    displayNumber: Int,
-    claim: ClaimInformation,
-    navController: NavController
+    displayNumber: Int, claim: ClaimInformation, navController: NavController
 ) {
     val context = LocalContext.current
 
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .padding(horizontal = 16.dp, vertical = 8.dp),
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface,
             contentColor = MaterialTheme.colorScheme.onSurface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-        onClick = { navController.navigate("claimInfoScreen/${claim.claimId}") }
-    ) {
+
+        // Navigate to the claim info screen when the card is clicked
+        onClick = { navController.navigate("claimInfoScreen/${claim.claimId}") }) {
+
         Box(modifier = Modifier.fillMaxWidth()) {
 
             Row(
@@ -49,6 +48,7 @@ fun ClaimCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
+                // Display the claim photo
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -56,6 +56,7 @@ fun ClaimCard(
                         .clip(RoundedCornerShape(8.dp)),
                     contentAlignment = Alignment.Center
                 ) {
+
                     DisplayClaimImage(
                         fileName = claim.claimPhoto,
                         context = context,
@@ -65,15 +66,15 @@ fun ClaimCard(
 
                 Spacer(Modifier.width(12.dp))
 
-
+                // Display the claim description
                 Column(
-                    modifier = Modifier
-                        .weight(2f),
-                    verticalArrangement = Arrangement.Center
+                    modifier = Modifier.weight(2f), verticalArrangement = Arrangement.Center
                 ) {
                     Text(
                         text = "Claim $displayNumber",
-                        style = MaterialTheme.typography.titleLarge.copy(fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontSize = 18.sp, fontWeight = FontWeight.Bold
+                        )
                     )
 
                     Spacer(Modifier.height(4.dp))
@@ -87,7 +88,7 @@ fun ClaimCard(
                 }
             }
 
-
+            // Display the claim status
             Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -99,13 +100,14 @@ fun ClaimCard(
     }
 }
 
+// Status badge
 @Composable
 fun StatusBadge(status: String) {
     val (bg, fg) = when (status) {
         "Approved" -> Color(0xFFA1DE93) to Color.White
-        "Pending"  -> Color(0xFF70A1D7) to Color.White
+        "Pending" -> Color(0xFF70A1D7) to Color.White
         "Rejected" -> Color(0xFFF47C7C) to Color.White
-        else       -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
+        else -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurfaceVariant
     }
 
     Box(
@@ -114,9 +116,7 @@ fun StatusBadge(status: String) {
             .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
         Text(
-            text = status,
-            color = fg,
-            style = MaterialTheme.typography.bodySmall
+            text = status, color = fg, style = MaterialTheme.typography.bodySmall
         )
     }
 }

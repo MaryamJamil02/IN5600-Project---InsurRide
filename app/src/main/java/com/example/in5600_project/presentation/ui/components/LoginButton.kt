@@ -42,76 +42,70 @@ fun LoginButton(
     var successfullyLoggedIn = false
     var currentUserId = ""
 
-    Button(
-        modifier = modifier,
-        onClick = {
-            // Hash the password before sending it to the server
-            val hashedPassword: String = hashPassword(password)
+    Button(modifier = modifier, onClick = {
 
-            coroutineScope.launch {
-                // Remote login
-                val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
+        // Hash the password before sending it to the server
+        val hashedPassword: String = hashPassword(password)
 
-                if (responseLogin != null) {
-                    userManager.saveUserPreferences(
-                        responseLogin.id,
-                        responseLogin.email,
-                        hashedPassword
-                    )
-                    currentUserId = responseLogin.id
-                    successfullyLoggedIn = true
-                    Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
-                }
+        coroutineScope.launch {
 
-                if (successfullyLoggedIn) {
-                    // Fetch claims metadata
-                    val claimsNumber   = getMethodMyClaimsNumber(context, currentUserId)
-                    val claimsIds      = getMethodMyClaimsIds(context, currentUserId)
-                    val claimsList     = getMethodMyClaimsDesc(context, currentUserId)
-                    val claimsPhoto    = getMethodMyClaimsPhoto(context, currentUserId)
-                    val claimsLocation = getMethodMyClaimsLocation(context, currentUserId)
-                    val claimsStatus   = getMethodMyClaimsStatus(context, currentUserId)
+            // Remote login
+            val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
 
-                    if (claimsNumber != null
-                        && claimsIds != null
-                        && claimsList != null
-                        && claimsPhoto != null
-                        && claimsLocation != null
-                        && claimsStatus != null
-                    ) {
-                        // --- NEW: cache each photo locally under filesDir/<fileName>
-                        claimsPhoto.forEach { fileName ->
-                            val base64String = getMethodDownloadPhoto(context, fileName)
-                            if (base64String != null) {
-                                val imageBytes = Base64.decode(
-                                    base64String,
-                                    Base64.NO_WRAP or Base64.URL_SAFE
-                                )
-                                val cacheFile = File(context.filesDir, fileName)
-                                FileOutputStream(cacheFile).use { it.write(imageBytes) }
-                            }
+            if (responseLogin != null) {
+                userManager.saveUserPreferences(
+                    responseLogin.id, responseLogin.email, hashedPassword
+                )
+                currentUserId = responseLogin.id
+                successfullyLoggedIn = true
+                Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+            }
+
+            // If login was successful, fetch claims data
+            if (successfullyLoggedIn) {
+
+                // Fetch claims metadata
+                val claimsNumber = getMethodMyClaimsNumber(context, currentUserId)
+                val claimsIds = getMethodMyClaimsIds(context, currentUserId)
+                val claimsList = getMethodMyClaimsDesc(context, currentUserId)
+                val claimsPhoto = getMethodMyClaimsPhoto(context, currentUserId)
+                val claimsLocation = getMethodMyClaimsLocation(context, currentUserId)
+                val claimsStatus = getMethodMyClaimsStatus(context, currentUserId)
+
+                if (claimsNumber != null && claimsIds != null && claimsList != null && claimsPhoto != null && claimsLocation != null && claimsStatus != null) {
+                    // Download and cache images
+                    claimsPhoto.forEach { fileName ->
+                        val base64String = getMethodDownloadPhoto(context, fileName)
+                        if (base64String != null) {
+                            val imageBytes = Base64.decode(
+                                base64String, Base64.NO_WRAP or Base64.URL_SAFE
+                            )
+                            // Save the image to the cache
+                            val cacheFile = File(context.filesDir, fileName)
+                            FileOutputStream(cacheFile).use { it.write(imageBytes) }
                         }
-
-                        // Save claims (with file names) in DataStore
-                        claimsManager.saveUserClaims(
-                            currentUserId,
-                            claimsNumber,
-                            claimsIds,
-                            claimsList,
-                            claimsPhoto,
-                            claimsLocation,
-                            claimsStatus
-                        )
                     }
-                    // Set the current user's email for logout
-                    myProfileViewModel.onUserIdChanged(currentUserId)
-                    navController.navigate("claimsHomeScreen")
+
+                    // Save claims (with file names) in DataStore
+                    claimsManager.saveUserClaims(
+                        currentUserId,
+                        claimsNumber,
+                        claimsIds,
+                        claimsList,
+                        claimsPhoto,
+                        claimsLocation,
+                        claimsStatus
+                    )
                 }
+
+                // Set the current user's email for logout
+                myProfileViewModel.onUserIdChanged(currentUserId)
+                navController.navigate("claimsHomeScreen")
             }
         }
-    ) {
+    }) {
         Text("Login")
     }
 }
