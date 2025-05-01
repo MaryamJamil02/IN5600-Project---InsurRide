@@ -369,7 +369,6 @@ fun ClaimInfoScreen(
                                         tint = Color(0xFF213555)
                                     )
                                 }
-
                                 if (viewModel.photo.value.isNotEmpty()) {
                                     AsyncImage(
                                         model = viewModel.photo.value,
@@ -378,6 +377,15 @@ fun ClaimInfoScreen(
                                             .fillMaxWidth()
                                             .height(180.dp)
                                             .align(Alignment.BottomCenter)
+                                            .clip(RoundedCornerShape(8.dp))
+                                    )
+                                } else {
+                                    DisplayClaimImage(
+                                        fileName = claim.claimPhoto,
+                                        context = context,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(180.dp)
                                             .clip(RoundedCornerShape(8.dp))
                                     )
                                 }
