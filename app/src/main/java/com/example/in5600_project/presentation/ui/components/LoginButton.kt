@@ -1,7 +1,6 @@
 // LoginButton.kt
 package com.example.in5600_project.presentation.ui.components
 
-import android.graphics.BitmapFactory
 import android.util.Base64
 import android.widget.Toast
 import androidx.compose.material3.Button
@@ -23,6 +22,7 @@ import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import com.example.in5600_project.presentation.viewmodel.MyProfileViewModel
+import kotlinx.coroutines.flow.first
 import methodPostRemoteLogin
 import java.io.File
 import java.io.FileOutputStream
@@ -49,18 +49,32 @@ fun LoginButton(
 
         coroutineScope.launch {
 
-            // Remote login
-            val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
+            // Get the current list of the stored users
+            val users = userManager.getUserPreferences().first()
 
-            if (responseLogin != null) {
-                userManager.saveUserPreferences(
-                    responseLogin.id, responseLogin.email, hashedPassword
-                )
-                currentUserId = responseLogin.id
+            // Check if a user with the provided email is already logged in
+            if (users.any { it.email == email && it.password == hashedPassword}) {
                 successfullyLoggedIn = true
-                Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+                currentUserId = users.first { it.email == email }.id
+                Toast.makeText(context, "Local login successful", Toast.LENGTH_SHORT).show()
+            }
+
+            // Remote login
+            else{
+
+                // Attempt remote login
+                val responseLogin = methodPostRemoteLogin(context, email, hashedPassword)
+
+                if (responseLogin != null) {
+                    userManager.saveUserPreferences(
+                        responseLogin.id, responseLogin.email, hashedPassword
+                    )
+                    currentUserId = responseLogin.id
+                    successfullyLoggedIn = true
+                    Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+                }
             }
 
             // If login was successful, fetch claims data

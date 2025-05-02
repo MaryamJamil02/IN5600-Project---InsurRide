@@ -62,8 +62,14 @@ fun NewClaimButton(
                         context, userId, numberOfClaims.toString(), newClaimPhoto, imageUri
                     )
 
+                    if (responseUploadPhoto == null || responseNewClaim == null) {
+                        Toast.makeText(context, "Offline - Failed to add new claim", Toast.LENGTH_SHORT)
+                            .show()
+                        return@launch
+                    }
+
                     // Check if both operations were successful
-                    if (responseNewClaim != null && responseUploadPhoto != null) {
+                    else if (responseNewClaim != null && responseUploadPhoto != null) {
 
                         // Create a new ClaimInformation object
                         val newClaim = ClaimInformation(

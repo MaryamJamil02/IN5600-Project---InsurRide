@@ -36,6 +36,20 @@ class UserManager(private val context: Context) {
         }
     }
 
+    // Return all stored users
+    fun getUserPreferences(): Flow<List<UserInformation>> {
+        return context.dataStore.data.map { preferences ->
+            val users = preferences[USERS] ?: emptySet()
+            users.map { user ->
+                UserInformation(
+                    id = preferences[userIdKey(user)] ?: "",
+                    email = preferences[emailKey(user)] ?: "",
+                    password = preferences[passwordKey(user)] ?: ""
+                )
+            }
+        }
+    }
+
 
     suspend fun getUserEmailString(targetUserId: String): String {
         return context.dataStore.data.map { preferences ->
@@ -61,3 +75,10 @@ suspend fun clearDataStore(context: Context) {
         preferences.clear()
     }
 }
+
+// Data class to store user information
+data class UserInformation(
+    val id: String,
+    val email: String,
+    val password: String
+)
